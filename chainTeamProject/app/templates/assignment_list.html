@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}임무 할당 목록{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">임무 할당 목록</h2>
+
+<div class="mb-3">
+    <a href="{{ url_for('main.assignment_new') }}" class="btn btn-primary">새 임무 할당</a>
+</div>
+
+<table class="table table-sm table-hover">
+    <thead class="table-dark">
+    <tr>
+        <th>#</th>
+        <th>임무</th>
+        <th>배정 팀</th>
+        <th>상태</th>
+        <th>배정 시각</th>
+        <th>상세</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for a in assignments %}
+    <tr>
+        <td>{{ a.id }}</td>
+        <td>{{ a.mission_title }}</td>
+        <td>{{ a.team_name }}</td>
+        <td>{{ a.status }}</td>
+        <td>{{ a.assigned_at }}</td>
+        <td>
+            <a href="{{ url_for('main.mission_detail', mission_id=a.mission_id) }}"
+               class="btn btn-sm btn-outline-secondary">
+                임무 보기
+            </a>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="6" class="text-muted">등록된 임무 할당이 없습니다.</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

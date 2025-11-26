@@ -1,0 +1,41 @@
+{# app/templates/demon_risk.html #}
+{% extends "base.html" %}
+{% block title %}악마 위험도 목록{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">악마 위험도 목록</h2>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>#</th>
+        <th>악마</th>
+        <th>사망자</th>
+        <th>부상자</th>
+        <th>위험 점수</th>
+        <th>위험 등급</th>
+        <th>현상금</th>
+        <th>상세</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for d in devils %}
+    <tr>
+        <td>{{ d.id }}</td>
+        <td>{{ d.name }}</td>
+        <td>{{ d.civilian_killed_total }}</td>
+        <td>{{ d.civilian_injured_total }}</td>
+        <td>{{ d.risk_score }}</td>
+        <td>{{ d.rank }}</td>
+        <td>{{ "{:,}".format(d.bounty) }} 원</td>
+        <td>
+            <a class="btn btn-outline-secondary btn-sm"
+               href="{{ url_for('main.demon_detail', demon_id=d.id) }}">
+                상세
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

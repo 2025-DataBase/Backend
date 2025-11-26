@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}임무 목록{% endblock %}
+{% block content %}
+<h2 class="mb-3">임무 목록</h2>
+
+<table class="table table-hover">
+    <thead class="table-dark">
+    <tr>
+        <th>#</th>
+        <th>제목</th>
+        <th>대상 악마</th>
+        <th>상태</th>
+        <th>마감일</th>
+        <th>상세</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for m in missions %}
+    <tr>
+        <td>{{ m.id }}</td>
+        <td>{{ m.title }}</td>
+        <td>{{ m.demon_name }}</td>
+        <td>{{ m.status }}</td>
+        <td>{{ m.deadline }}</td>
+        <td>
+            <a class="btn btn-sm btn-outline-secondary"
+               href="{{ url_for('main.mission_detail', mission_id=m.id) }}">
+                보기
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

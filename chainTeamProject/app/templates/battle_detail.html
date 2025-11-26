@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}전투 상세{% endblock %}
+{% block content %}
+<h2 class="mb-3">전투 상세 정보</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h4 class="card-title">전투 #{{ battle.id }}</h4>
+        <p class="card-text mb-1"><strong>악마:</strong> {{ battle.demon_name }}</p>
+        <p class="card-text mb-1"><strong>헌터:</strong> {{ battle.hunter_name }}</p>
+        <p class="card-text mb-1"><strong>결과:</strong> {{ battle.result }}</p>
+        {% if battle.reward is defined %}
+            {% set amount = battle.reward or 0 %}
+        {% elif battle.total_reward is defined %}
+            {% set amount = battle.total_reward or 0 %}
+        {% else %}
+            {% set amount = 0 %}
+        {% endif %}
+
+        <p class="card-text mb-1">
+            <strong>보상:</strong> {{ "{:,}".format(amount) }} 원
+        </p>
+
+    </div>
+</div>
+
+{% if not battle.claimed %}
+<form method="post" action="{{ url_for('main.claim_page', battle_id=battle.id) }}">
+    <button type="submit" class="btn btn-primary">보상 지급 처리</button>
+</form>
+{% else %}
+<p class="text-muted">이미 보상이 지급된 전투입니다.</p>
+{% endif %}
+{% endblock %}

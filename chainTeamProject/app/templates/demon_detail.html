@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}악마 상세{% endblock %}
+{% block content %}
+<h2 class="mb-3">악마 상세 정보</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h4 class="card-title">{{ demon.name }}</h4>
+        <p class="card-text mb-1"><strong>위험 등급:</strong> {{ demon.grade or '-' }}</p>
+        <p class="card-text mb-1"><strong>사망자:</strong> {{ demon.civilian_killed_total }}</p>
+        <p class="card-text mb-1"><strong>부상자:</strong> {{ demon.civilian_injured_total }}</p>
+        <p class="card-text mb-1">
+            <strong>현상금:</strong> {{ "{:,}".format(demon.bounty or 0) }} 원
+        </p>
+    </div>
+</div>
+
+<h4>관련 전투 기록</h4>
+<table class="table table-sm table-hover">
+    <thead class="table-dark">
+    <tr>
+        <th>#</th>
+        <th>헌터</th>
+        <th>결과</th>
+        <th>보상</th>
+        <th>상세</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for b in battles %}
+    <tr>
+        <td>{{ b.id }}</td>
+        <td>{{ b.hunter_names }}</td>
+        <td>{{ b.outcome }}</td>
+        <td>
+            {# total_reward 가 없거나 None 이면 0으로 처리 #}
+            {% set amount = b.total_reward or 0 %}
+            {{ "{:,}".format(amount) }} 원
+        </td>
+        <td>
+            <a href="{{ url_for('main.battle_detail', battle_id=b.id) }}"
+               class="btn btn-sm btn-outline-secondary">
+                전투 보기
+            </a>
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" class="text-muted">관련 전투 기록이 없습니다.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

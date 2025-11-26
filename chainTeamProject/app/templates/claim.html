@@ -1,0 +1,42 @@
+{# app/templates/claim.html #}
+{% extends "base.html" %}
+{% block title %}보상 지급{% endblock %}
+{% block content %}
+<h2 class="mb-3">보상 지급</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h4 class="card-title">전투 #{{ battle.id }}</h4>
+        <p class="card-text mb-1"><strong>악마:</strong> {{ battle.demon_name }}</p>
+        <p class="card-text mb-1"><strong>위치:</strong> {{ battle.location }}</p>
+        <p class="card-text mb-1"><strong>보상:</strong>
+            {% if battle.reward %}
+            {{ "{:,}".format(battle.reward) }} 원
+            {% else %}
+            0 원
+            {% endif %}
+        </p>
+    </div>
+</div>
+
+{% if success is none %}
+{# 처음 GET으로 들어온 경우 #}
+<form method="post">
+    <button type="submit" class="btn btn-primary">
+        보상 지급하기
+    </button>
+    <a href="{{ url_for('main.battle_detail', battle_id=battle.id) }}" class="btn btn-secondary ms-2">
+        취소
+    </a>
+</form>
+{% elif success %}
+<div class="alert alert-success">
+    보상 분배가 완료되었습니다.
+</div>
+{% else %}
+<div class="alert alert-danger">
+    이 전투는 아직 DONE / CANCELLED 상태의 임무에 속해 있지 않거나,
+    분배 조건을 만족하지 않아 보상 지급을 할 수 없습니다.
+</div>
+{% endif %}
+{% endblock %}

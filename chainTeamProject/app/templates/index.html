@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}홈{% endblock %}
+{% block content %}
+<h2 class="mb-3">Devil Hunter 시스템</h2>
+<p>왼쪽 상단 메뉴를 통해 악마 위험도, 전투 기록, 임무 목록을 확인할 수 있습니다.</p>
+
+<ul>
+    <li><a href="{{ url_for('main.devil_risk_page') }}">악마 위험도 대시보드</a></li>
+    <li><a href="{{ url_for('main.battle_list') }}">전투 기록</a></li>
+    <li><a href="{{ url_for('main.mission_list') }}">임무 목록</a></li>
+</ul>
+{% endblock %}
