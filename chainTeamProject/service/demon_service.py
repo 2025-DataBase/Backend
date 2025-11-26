@@ -1,51 +1,58 @@
-# chainTeamProject/service/devil_service.py
-
+# service/demon_service.py
 from db import demon_repository
 
+def calculate_grade_and_bounty(killed_total, injured_total):
+    score = killed_total * 10 + injured_total * 3
 
-def _calculate_risk_score(killed: int, injured: int) -> int:
-    killed = killed or 0
-    injured = injured or 0
-    return killed * 3 + injured
+    if score < 50:
+        grade = 'C'
+        bounty = 200_000
+    elif score < 150:
+        grade = 'B'
+        bounty = 500_000
+    elif score < 300:
+        grade = 'A'
+        bounty = 800_000
+    elif score < 600:
+        grade = 'S'
+        bounty = 1_200_000
+    else:
+        grade = 'SS'
+        bounty = 1_500_000
 
+    return grade, bounty, score
 
-def _score_to_grade(score: int) -> str:
-    if score >= 80:  return "SS"
-    if score >= 70:  return "S"
-    if score >= 60:  return "A"
-    if score >= 50:  return "B"
-    return "C"
-
-
-def get_demon_risk_list(update_rank: bool = False):
-    devils = demon_repository.find_all_devils()
+def get_demon_risk_list():
+    """
+    1. Battle 기준으로 각 Demon의 killed/injured 합계를 계산하고
+    2. grade, bounty를 재계산해서 Demon 테이블에 반영
+    3. 화면에는 score까지 같이 내려줌
+    """
+    demons = demon_repository.get_all_demons()
     result = []
 
-    for d in devils:
-        score = _calculate_risk_score(
-            d["civilian_killed_total"],
-            d["civilian_injured_total"]
-        )
-        rank = _score_to_grade(score)
+    for d in demons:
+        demon_id = d["demon_id"]
+        killed_sum, injured_sum = demon_repository.recalc_totals_from_battles(demon_id)
+        grade, bounty, score = calculate_grade_and_bounty(killed_sum, injured_sum)
 
-        if update_rank:
-            demon_repository.update_devil_rank(d["demon_id"], rank)
+        # DB 값이랑 차이가 있으면 업데이트
+        if (d["civilian_killed_total"] != killed_sum or
+                d["civilian_injured_total"] != injured_sum or
+                d["grade"] != grade or
+                d["bounty"] != bounty):
+
+            demon_repository.update_demon_totals_and_risk(
+                demon_id, killed_sum, injured_sum, grade, bounty
+            )
 
         result.append({
-            "id": d["demon_id"],
+            "demon_id": demon_id,
             "name": d["name"],
-            "bounty": d["bounty"],
-            "civilian_killed_total": d["civilian_killed_total"],
-            "civilian_injured_total": d["civilian_injured_total"],
-            "rank": rank,
-            "risk_score": score
+            "grade": grade,
+            "bounty": bounty,
+            "killed_total": killed_sum,
+            "injured_total": injured_sum,
+            "score": score,
         })
-
     return result
-
-
-def get_demon_by_id(demon_id: int):
-    for d in get_demon_risk_list(update_rank=False):
-        if d["id"] == demon_id:
-            return d
-    return None

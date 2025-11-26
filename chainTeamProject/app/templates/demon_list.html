@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}악마 위험도{% endblock %}
+
+{% block content %}
+<h2>악마 위험도 현황</h2>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>이름</th>
+        <th>등급</th>
+        <th>현상금</th>
+        <th>사망자</th>
+        <th>부상자</th>
+        <th>위험 점수</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for d in demons %}
+    <tr>
+        <td>{{ d.demon_id }}</td>
+        <td>{{ d.name }}</td>
+        <td>{{ d.grade }}</td>
+        <td>{{ "{:,}".format(d.bounty) }}</td>
+        <td>{{ d.killed_total }}</td>
+        <td>{{ d.injured_total }}</td>
+        <td>{{ d.score }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<p class="text-muted">※ 전투 기록(Battle)을 기준으로 자동 집계 및 등급/현상금 재계산</p>
+{% endblock %}

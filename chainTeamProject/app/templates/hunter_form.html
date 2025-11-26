@@ -1,0 +1,34 @@
+{# hunter_form.html #}
+{% extends "base.html" %}
+{% block title %}헌터 등록{% endblock %}
+{% block content %}
+<h2>헌터 등록</h2>
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">이름</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">상태</label>
+        <select name="status" class="form-select">
+            <option value="ACTIVE">ACTIVE</option>
+            <option value="INACTIVE">INACTIVE</option>
+            <option value="RETIRED">RETIRED</option>
+            <option value="DEAD">DEAD</option>
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">소속 팀</label>
+        <select name="team_id" class="form-select">
+            <option value="">(팀 없음)</option>
+            {% for t in teams %}
+            <option value="{{ t.team_id }}">{{ t.team_name }} ({{ t.region }})</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button class="btn btn-success">등록</button>
+</form>
+{% endblock %}

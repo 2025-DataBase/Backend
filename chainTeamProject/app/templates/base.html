@@ -2,30 +2,40 @@
 <html lang="ko">
 <head>
     <meta charset="utf-8">
-    <title>{% block title %}Devil Hunter System{% endblock %}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>{% block title %}체인 헌터 시스템{% endblock %}</title>
+    <link
+            href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+            rel="stylesheet">
 </head>
-<body class="bg-light">
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-4">
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
     <div class="container-fluid">
-        <a class="navbar-brand" href="{{ url_for('main.index') }}">Devil Hunter</a>
-
-        <div class="navbar-nav">
-            <a class="nav-link" href="{{ url_for('main.devil_risk_page') }}">악마 위험도</a>
-            <a class="nav-link" href="{{ url_for('main.battle_list') }}">전투 기록</a>
-            <a class="nav-link" href="{{ url_for('main.mission_list') }}">임무 관리</a>
-            <a class="nav-link" href="{{ url_for('main.hunter_list') }}">헌터 목록</a>
-
-            <!-- 임무 할당 기능 추가 -->
-            <a class="nav-link" href="{{ url_for('main.assignment_list') }}">임무 할당 목록</a>
-            <a class="nav-link" href="{{ url_for('main.assignment_new') }}">임무 할당 등록</a>
-        </div>
+        <a class="navbar-brand" href="{{ url_for('main.index') }}">Chain DB</a>
+        <ul class="navbar-nav me-auto">
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.demon_list') }}">악마 위험도</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.hunter_list') }}">헌터</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.mission_list') }}">미션</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.mission_assign') }}">미션 할당</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{ url_for('main.battle_list') }}">전투 기록</a></li>
+        </ul>
     </div>
 </nav>
 
 <div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    {% for category, msg in messages %}
+    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+        {{ msg }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
     {% block content %}{% endblock %}
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
