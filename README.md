@@ -1,3 +1,8 @@
+## 12월 2일 변경사항 (원가형)
+- 헌터 등록시 헌터팀 자동 배정 sQL 트리거 구현(헌터 등록시 기존에 있던 alive 선택 사항 삭제, default 값 = Active)
+- 보상 분배 + 계좌 연동 SQL 프로시저 구현 
+
+
 ## 기술 스택 및 설치 라이브러리
 
 - **언어**: Python 3.10.3
@@ -19,7 +24,7 @@
 
 ## 실행 방법 (요약)
 1. MySQL에 `chain_db.sql' 파일 사용
-   - DB 접속 정보는 `Backend/chainTeamProject/db/connection.py`에서 mysql 비밀 번호
+   - DB 접속 정보는 `Backend/chainTeamProject/db/connection.py`에서 mysql 비밀 번호 수정
 
 2. 서버 실행
 ```bash
@@ -28,4 +33,5 @@ python run.py
 ```
 
 3. 웹 브라우저에서 `http://localhost:5000` 접속
+
 
