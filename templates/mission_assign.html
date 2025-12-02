@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}미션 배정{% endblock %}
+
+{% block content %}
+<h2>미션 배정 – {{ mission.objective }}</h2>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <p><strong>팀:</strong> {{ mission.team_name }}</p>
+        <p><strong>마감일:</strong> {{ mission.due_date }}</p>
+    </div>
+</div>
+
+<h4>배정된 헌터</h4>
+<table class="table table-bordered mb-4">
+    <thead>
+    <tr>
+        <th>헌터</th>
+        <th>팀</th>
+        <th>상태</th>
+        <th>관리</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for a in assigned %}
+    <tr>
+        <td>{{ a.hunter_name }}</td>
+        <td>{{ a.hunter_team or '-' }}</td>
+        <td>{{ a.assignment_status }}</td>
+        <td>
+            <a href="{{ url_for('mission_assignment_delete', assignment_id=a.assignment_id) }}"
+               class="btn btn-sm btn-danger">삭제</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+
+<h4>배정 가능한 헌터</h4>
+<form method="post" class="row g-3">
+
+    <div class="col-4">
+        <select name="hunter_id" class="form-control">
+            {% for c in candidates %}
+            <option value="{{ c.hunter_id }}">
+                {{ c.hunter_name }} — {{ c.hunter_team or '-' }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="col-2">
+        <button class="btn btn-success">배정 추가</button>
+    </div>
+
+</form>
+
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}미션 등록{% endblock %}
+
+{% block content %}
+<h2>미션 생성</h2>
+
+<form method="post">
+    <div class="mb-3">
+        <label>팀 선택</label>
+        <select name="team_id" class="form-control">
+            {% for t in teams %}
+            <option value="{{ t.team_id }}">{{ t.team_name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>목표</label>
+        <input type="text" name="objective" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>목표 상세</label>
+        <textarea name="target_desc" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label>마감일</label>
+        <input type="date" name="due_date" class="form-control">
+    </div>
+
+    <button class="btn btn-primary">등록</button>
+</form>
+
+{% endblock %}

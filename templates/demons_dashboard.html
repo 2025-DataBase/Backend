@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}악마 대시보드{% endblock %}
+
+{% block content %}
+<h2>악마 대시보드</h2>
+
+<form method="post" action="{{ url_for('demon_recalc') }}" class="mb-3">
+    <button class="btn btn-warning">전체 위험도 / 현상금 재계산</button>
+</form>
+
+<div class="row mb-4">
+    <div class="col">전체: {{ total }}</div>
+    <div class="col text-danger">EXTREME: {{ extreme }}</div>
+    <div class="col text-warning">DANGER: {{ danger }}</div>
+    <div class="col text-info">WARNING: {{ warning }}</div>
+</div>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>악마</th>
+        <th>등급</th>
+        <th>현상금</th>
+        <th>위험도</th>
+        <th>전투 수</th>
+        <th>사/부</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for d in demons %}
+    <tr>
+        <td>{{ d.name }}</td>
+        <td>{{ d.grade }}</td>
+        <td>{{ d.bounty }}</td>
+        <td>{{ d.risk_level }}</td>
+        <td>{{ d.battle_count }}</td>
+        <td>{{ d.civilian_killed_total }}/{{ d.civilian_injured_total }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

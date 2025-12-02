@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}배정 현황{% endblock %}
+
+{% block content %}
+<h2>임무 배정 현황</h2>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>미션</th>
+        <th>헌터</th>
+        <th>상태</th>
+        <th>배정 시간</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    {% for a in assignments %}
+    <tr>
+        <td>{{ a.mission_id }} / {{ a.objective }}</td>
+        <td>{{ a.hunter_name }}</td>
+        <td>{{ a.assignment_status }}</td>
+        <td>{{ a.assigned_at }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

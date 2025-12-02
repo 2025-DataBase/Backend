@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}헌터 상세{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">{{ hunter.hunter_name }} 상세 정보</h2>
+
+<div class="card">
+    <div class="card-body">
+
+        <p><strong>ID:</strong> {{ hunter.hunter_id }}</p>
+        <p><strong>팀:</strong> {{ hunter.team_name or '-' }}</p>
+        <p><strong>상태:</strong> {{ hunter.hunter_status }}</p>
+
+        <hr>
+
+        <p><strong>잔액:</strong> {{ hunter.balance }}</p>
+        <p><strong>총 수입:</strong> {{ hunter.total_income }}</p>
+        <p><strong>총 지출:</strong> {{ hunter.total_spent }}</p>
+
+        <p>
+            <strong>최근 거래:</strong>
+            {{ hunter.last_tx_type }} /
+            {{ hunter.last_tx_amount }} /
+            {{ hunter.last_tx_desc }}
+        </p>
+
+    </div>
+</div>
+
+{% endblock %}

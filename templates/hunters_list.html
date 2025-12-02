@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}헌터 목록{% endblock %}
+
+{% block content %}
+<h2>헌터 목록</h2>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>이름</th>
+        <th>팀</th>
+        <th>상태</th>
+        <th>잔액</th>
+        <th>총 수입</th>
+        <th>보기</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for h in hunters %}
+    <tr>
+        <td>{{ h.hunter_name }}</td>
+        <td>{{ h.team_name or '-' }}</td>
+        <td>{{ h.hunter_status }}</td>
+        <td>{{ h.balance }}</td>
+        <td>{{ h.total_income }}</td>
+        <td>
+            <a class="btn btn-sm btn-primary"
+               href="{{ url_for('hunter_detail', hunter_id=h.hunter_id) }}">
+                상세
+            </a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

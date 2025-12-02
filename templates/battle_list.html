@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}전투 목록{% endblock %}
+
+{% block content %}
+<h2 class="mb-3">전투 목록</h2>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>악마</th>
+        <th>피해(사/부)</th>
+        <th>결과</th>
+        <th>위치</th>
+        <th>보기</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for b in battles %}
+    <tr>
+        <td>{{ b.battle_id }}</td>
+        <td>{{ b.demon_name }}</td>
+        <td>{{ b.civilian_killed }}/{{ b.civilian_injured }}</td>
+        <td>{{ b.outcome }}</td>
+        <td>{{ b.location }}</td>
+        <td>
+            <a href="{{ url_for('battle_detail', battle_id=b.battle_id) }}"
+               class="btn btn-sm btn-primary">상세</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

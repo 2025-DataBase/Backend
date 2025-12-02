@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}미션 목록{% endblock %}
+
+{% block content %}
+<h2>미션 목록</h2>
+
+<table class="table table-bordered">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>팀</th>
+        <th>목표</th>
+        <th>마감일</th>
+        <th>배정</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for m in missions %}
+    <tr>
+        <td>{{ m.mission_id }}</td>
+        <td>{{ m.team_name }}</td>
+        <td>{{ m.objective }}</td>
+        <td>{{ m.due_date }}</td>
+        <td>
+            <a href="{{ url_for('mission_assign', mission_id=m.mission_id) }}"
+               class="btn btn-sm btn-primary">배정</a>
+        </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+{% endblock %}

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}전투 등록{% endblock %}
+
+{% block content %}
+<h2>전투 생성</h2>
+
+<form method="post">
+
+    <div class="mb-3">
+        <label>소속 미션</label>
+        <select name="mission_id" class="form-control">
+            <option value="">(선택 안함)</option>
+            {% for m in missions %}
+            <option value="{{ m.mission_id }}">
+                {{ m.mission_id }} - {{ m.objective }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label>악마</label>
+        <select name="demon_id" class="form-control">
+            {% for d in demons %}
+            <option value="{{ d.demon_id }}">
+                {{ d.demon_id }} - {{ d.name }}
+            </option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="row">
+        <div class="col mb-3">
+            <label>시작 시간</label>
+            <input type="datetime-local" name="started_at" class="form-control">
+        </div>
+        <div class="col mb-3">
+            <label>종료 시간</label>
+            <input type="datetime-local" name="ended_at" class="form-control">
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <label>위치</label>
+        <input type="text" name="location" class="form-control">
+    </div>
+
+    <div class="mb-3">
+        <label>결과</label>
+        <input type="text" name="outcome" class="form-control">
+    </div>
+
+    <div class="row">
+        <div class="col mb-3">
+            <label>사망자 수</label>
+            <input type="number" name="civilian_killed" class="form-control">
+        </div>
+        <div class="col mb-3">
+            <label>부상자 수</label>
+            <input type="number" name="civilian_injured" class="form-control">
+        </div>
+    </div>
+
+    <textarea name="notes" class="form-control mb-3"
+              placeholder="추가 설명"></textarea>
+
+    <button class="btn btn-primary">등록</button>
+
+</form>
+
+{% endblock %}
