@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}미션 목록{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>미션 목록</h2>
+    <a href="{{ url_for('main.mission_assign') }}" class="btn btn-primary">
+        미션 생성/할당
+    </a>
+</div>
+
+<div class="mb-2">
+    {% if show_all %}
+    <a href="{{ url_for('main.mission_list') }}" class="btn btn-sm btn-secondary">진행중만 보기</a>
+    {% else %}
+    <a href="{{ url_for('main.mission_list', all=1) }}" class="btn btn-sm btn-outline-secondary">전체 보기(완료 포함)</a>
+    {% endif %}
+</div>
+
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>ID</th><th>팀</th><th>목표</th><th>대상</th><th>상태</th><th>기간</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for m in missions %}
+    <tr>
+        <td>{{ m.mission_id }}</td>
+        <td>{{ m.team_name }}</td>
+        <td>{{ m.objective }}</td>
+        <td>{{ m.target_desc }}</td>
+        <td>{{ m.status }}</td>
+        <td>{{ m.created_at }} ~ {{ m.due_date }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+
+<p class="text-muted">
+    SUCCESS 상태(=DONE)는 기본 목록에서 제외되며, “전체 보기”로 확인 가능합니다.
+</p>
+{% endblock %}

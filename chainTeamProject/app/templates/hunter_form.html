@@ -1,0 +1,19 @@
+{# hunter_form.html #}
+{% extends "base.html" %}
+{% block title %}헌터 등록{% endblock %}
+{% block content %}
+<h2>헌터 등록</h2>
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">이름</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">소속 팀</label>
+        <input type="text" class="form-control" value="등록 시 랜덤으로 팀 자동 배정됩니다." disabled>
+    </div>
+
+    <button class="btn btn-success">등록</button>
+</form>
+{% endblock %}

@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}미션 생성/할당{% endblock %}
+{% block content %}
+<h2>미션 생성 및 팀 할당</h2>
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">팀</label>
+        <select name="team_id" class="form-select" required>
+            {% for t in teams %}
+            <option value="{{ t.team_id }}">{{ t.team_name }} ({{ t.region }})</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">목표(Objective)</label>
+        <input type="text" name="objective" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">대상 설명(Target)</label>
+        <input type="text" name="target_desc" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">생성일(created_at)</label>
+        <input type="date" name="created_at" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">마감일(due_date)</label>
+        <input type="date" name="due_date" class="form-control" required>
+    </div>
+
+    <button class="btn btn-success">미션 생성 및 팀 배정</button>
+</form>
+
+<p class="text-muted mt-3">
+    선택된 팀에 ACTIVE 헌터가 한 명도 없으면, 미션에 배정할 수 없습니다.
+</p>
+{% endblock %}
