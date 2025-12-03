@@ -65,16 +65,16 @@ def mission_assign():
     if request.method == "POST":
         team_id = int(request.form.get("team_id"))
         objective = request.form.get("objective")
-        target_desc = request.form.get("target_desc")
+        #target_desc = request.form.get("target_desc")
         created_at = request.form.get("created_at")
         due_date = request.form.get("due_date")
 
-        if not (team_id and objective and target_desc and created_at and due_date):
+        if not (team_id and objective and created_at and due_date):
             flash("모든 필드를 입력하세요.", "danger")
             return redirect(url_for("main.mission_assign"))
 
         mission_id = mission_service.create_mission(
-            team_id, objective, target_desc, created_at, due_date
+            team_id, objective, created_at, due_date
         )
 
         try:
@@ -94,12 +94,23 @@ def battle_list():
     battles = battle_service.list_battles()
     return render_template("battle_list.html", battles=battles)
 
-@bp.route("/battles/<int:battle_id>/distribute", methods=["POST"])
-def battle_distribute(battle_id):
+# @bp.route("/battles/<int:battle_id>/distribute", methods=["POST"])
+# def battle_distribute(battle_id):
+#     try:
+#         share, n = battle_service.distribute_bounty(battle_id)
+#         flash(f"{n}명의 헌터에게 각 {share}원씩 분배했습니다.", "success")
+#     except ValueError as e:
+#         flash(str(e), "danger")
+
+#     return redirect(url_for("main.battle_list"))
+
+@bp.route('/battle_distribute/<int:mission_id>/<int:battle_seq>', methods=['POST'])
+def battle_distribute(mission_id, battle_seq):
     try:
-        share, n = battle_service.distribute_bounty(battle_id)
-        flash(f"{n}명의 헌터에게 각 {share}원씩 분배했습니다.", "success")
+        share, n = battle_service.distribute_bounty(mission_id, battle_seq)
+        flash(f"{n}명의 헌터에게 {share}씩 분배 완료!", "success")
     except ValueError as e:
         flash(str(e), "danger")
+    return redirect(url_for('main.battle_list'))
 
-    return redirect(url_for("main.battle_list"))
+

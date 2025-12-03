@@ -9,7 +9,7 @@
         <th>악마</th>
         <th>미션</th>
         <th>장소</th>
-        <th>시작</th>
+        <!-- <th>시작</th> -->
         <th>결과</th>
         <th>사망/부상</th>
         <th>분배</th>
@@ -18,20 +18,53 @@
     <tbody>
     {% for b in battles %}
     <tr>
-        <td>{{ b.battle_id }}</td>
+        <!--<td>{{ b.battle_id }}</td>-->
+        <td>{{ b.mission_id }}-{{ b.battle_seq }}</td>
         <td>{{ b.demon_name }}</td>
         <td>{{ b.objective or '-' }}</td>
         <td>{{ b.location }}</td>
-        <td>{{ b.started_at }}</td>
+        <!-- <td>{{ b.started_at }}</td> -->   <!--테이블에 이게 없네-->
         <td>{{ b.outcome }}</td>
-        <td>{{ b.civilian_killed }}/{{ b.civilian_injured }}</td>
+        {# 기존 사망/부상 출력 코드 #}
+        {# <td>{{ b.civilian_killed }}/{{ b.civilian_injured }}</td> #}
+        {# 개선: 데이터 없는 경우 '-' 처리 #}
         <td>
-            {% if b.outcome == 'HUMAN_WIN' %}
-            <form method="post" action="{{ url_for('main.battle_distribute', battle_id=b.battle_id) }}">
+            {% if b.civilian_killed is not none and b.civilian_injured is not none %}
+                {{ b.civilian_killed }}/{{ b.civilian_injured }}
+            {% else %}
+                -
+            {% endif %}
+        </td>
+
+        {# 기존 분배 칸 코드 #}
+        {# 
+        <td>
+            {% if b.outcome == 'HUNTER_WIN' and b.active_hunters > 0 %}
+            <form method="post" action="{{ url_for('main.battle_distribute', battle_id=b.mission_id, battle_seq=b.battle_seq) }}">
                 <button class="btn btn-sm btn-warning">분배하기</button>
             </form>
+
+            {% elif b.outcome == 'HUNTER_WIN' %}
+                참여 헌터 없음
+
             {% else %}
-            -
+                -
+            {% endif %}
+        </td>
+        #}
+
+        {# 개선된 분배 칸 코드 #}
+        <td>
+            {% if b.outcome == 'HUNTER_WIN' %}
+                {% if b.active_hunters > 0 %}
+                    <form method="post" action="{{ url_for('main.battle_distribute', battle_id=b.mission_id, battle_seq=b.battle_seq) }}">
+                        <button class="btn btn-sm btn-warning">분배하기</button>
+                    </form>
+                {% else %}
+                    참여 헌터 없음
+                {% endif %}
+            {% else %}
+                -
             {% endif %}
         </td>
     </tr>

@@ -1,25 +1,26 @@
 # db/hunter_repository.py
 from .connection import get_connection
 
-def get_all_hunters_with_team():
-    conn = get_connection()
-    try:
-        with conn.cursor() as cursor:
-            sql = """
-                  SELECT
-                      h.hunter_id,
-                      h.name,
-                      h.status,
-                      t.team_name,
-                      t.region
-                  FROM Human h
-                           LEFT JOIN Team t ON h.team_id = t.team_id
-                  ORDER BY t.team_name, h.name \
-                  """
-            cursor.execute(sql)
-            return cursor.fetchall()
-    finally:
-        conn.close()
+# def get_all_hunters_with_team():
+#     conn = get_connection()
+#     try:
+#         with conn.cursor() as cursor:
+#             sql = """
+#                   SELECT
+#                       h.hunter_id,
+#                       h.name,
+#                       h.status,
+#                       t.team_name,
+#                       t.region
+#                   FROM Human h
+#                            LEFT JOIN Team t ON h.team_id = t.team_id
+#                   ORDER BY t.team_name, h.name \
+#                   """
+#             cursor.execute(sql)
+#             return cursor.fetchall()
+#     finally:
+#         conn.close()
+# 해당 함수 및에 있는거 아님...? 중복이라 일단 제거함
 
 def get_hunter_by_id(hunter_id):
     conn = get_connection()
@@ -38,11 +39,11 @@ def get_hunter_by_id(hunter_id):
                       a.last_tx_amount,
                       a.last_tx_desc,
                       a.updated_at
-                  FROM Human h
+                  FROM Hunter h
                            LEFT JOIN Team t ON h.team_id = t.team_id
                            LEFT JOIN Account a ON h.hunter_id = a.hunter_id
                   WHERE h.hunter_id = %s \
-                  """
+                  """                               # From에서 Human -> Hunter
             cursor.execute(sql, (hunter_id,))
             return cursor.fetchone()
     finally:
@@ -69,9 +70,9 @@ def create_hunter(name, status, team_id):
     try:
         with conn.cursor() as cursor:
             sql = """
-                  INSERT INTO Human (name, status, team_id)
+                  INSERT INTO Hunter (name, status, team_id)
                   VALUES (%s, %s, %s) \
-                  """
+                  """           # From에서 Human -> Hunter
             cursor.execute(sql, (name, status, team_id))
             hunter_id = cursor.lastrowid
         conn.commit()
@@ -91,10 +92,10 @@ def get_all_hunters_with_team():
                       h.team_id,          -- ★ 반드시 포함
                       t.team_name,
                       t.region
-                  FROM Human h
+                  FROM Hunter h
                            LEFT JOIN Team t ON h.team_id = t.team_id
                   ORDER BY t.team_name, h.name \
-                  """
+                  """           # # From에서 Human -> Hunter
             cursor.execute(sql)
             return cursor.fetchall()
     finally:
@@ -116,11 +117,11 @@ def get_hunters_by_team(team_id):
                       h.team_id,
                       t.team_name,
                       t.region
-                  FROM Human h
+                  FROM Hunter h
                            JOIN Team t ON h.team_id = t.team_id
                   WHERE h.team_id = %s
                   ORDER BY h.name \
-                  """
+                  """           # From에서 Human -> Hunter
             cursor.execute(sql, (team_id,))
             return cursor.fetchall()
     finally:

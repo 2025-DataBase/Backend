@@ -11,11 +11,11 @@ def get_all_demons():
                       name,
                       grade,
                       bounty,
-                      civilian_killed_total,
-                      civilian_injured_total
+                      civilian_kills,
+                      civilian_injuries
                   FROM Demon
                   ORDER BY bounty DESC \
-                  """
+                  """                               # 시민에 대한 테이블 속성 이름 수정 반영
             cursor.execute(sql)
             return cursor.fetchall()
     finally:
@@ -28,12 +28,12 @@ def update_demon_totals_and_risk(demon_id, killed_total, injured_total,
         with conn.cursor() as cursor:
             sql = """
                   UPDATE Demon
-                  SET civilian_killed_total = %s,
-                      civilian_injured_total = %s,
+                  SET civilian_kills = %s,
+                      civilian_injuries = %s,
                       grade = %s,
                       bounty = %s
                   WHERE demon_id = %s \
-                  """
+                  """                           # 시민에 대한 테이블 속성 이름 수정 반영
             cursor.execute(sql, (killed_total, injured_total,
                                  grade, bounty, demon_id))
         conn.commit()
@@ -53,7 +53,7 @@ def recalc_totals_from_battles(demon_id):
                       COALESCE(SUM(civilian_injured), 0) AS injured_sum
                   FROM Battle
                   WHERE demon_id = %s \
-                  """
+                  """                       # 여긴 왜 시민에 대한 테이블 속성 이름 수정 반영된거지? .... 작동 안 되었을텐데..?
             cursor.execute(sql, (demon_id,))
             row = cursor.fetchone()
             return row["killed_sum"], row["injured_sum"]

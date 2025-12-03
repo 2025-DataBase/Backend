@@ -37,10 +37,11 @@ def get_demon_risk_list():
         grade, bounty, score = calculate_grade_and_bounty(killed_sum, injured_sum)
 
         # DB 값이랑 차이가 있으면 업데이트
-        if (d["civilian_killed_total"] != killed_sum or
-                d["civilian_injured_total"] != injured_sum or
+        if (d["civilian_kills"] != killed_sum or
+                d["civilian_injuries"] != injured_sum or
                 d["grade"] != grade or
                 d["bounty"] != bounty):
+            # 우우우 ㅜㅜㅜ 여겨 또 문제야.... 수정하자...
 
             demon_repository.update_demon_totals_and_risk(
                 demon_id, killed_sum, injured_sum, grade, bounty
