@@ -10,7 +10,7 @@ INSERT INTO `Computer_2`.`Demon`
 VALUES
 ('Azazel', 'SS', 'ALIVE', 1000000, 50, 20);
 
--- 전투 기록 생성
+
 INSERT INTO `Computer_2`.`Battle` 
 (mission_id, battle_seq, demon_id, outcome, location, civilian_killed, civilian_injured)
 VALUES 
