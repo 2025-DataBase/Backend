@@ -111,4 +111,6 @@ def distribute_bounty(battle_id, battle_seq):
         # ex) 해당 mission_id의 모든 battle outcome 확인 후, 모두 HUNTER_WIN이면 SUCCESS, 
         #     하나라도 DEMON_WIN이면 FAIL, 진행중인 배틀이 있으면 IN_PROGRESS 유지
 
+    
+    return share, n
 

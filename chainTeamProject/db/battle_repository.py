@@ -203,3 +203,18 @@ def update_distribution_to_done(battle_id, share_amount, battle_seq):       # 3ê
         conn.commit()
     finally:
         conn.close()
+
+
+def get_reward_for_battle(mission_id, battle_seq):
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT *
+                FROM Reward
+                WHERE mission_id = %s AND battle_seq = %s
+            """
+            cursor.execute(sql, (mission_id, battle_seq))
+            return cursor.fetchone()
+    finally:
+        conn.close()

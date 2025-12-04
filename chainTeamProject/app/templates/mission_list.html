@@ -19,7 +19,7 @@
 <table class="table table-striped">
     <thead>
     <tr>
-        <th>ID</th><th>팀</th><th>목표</th><th>대상</th><th>상태</th><th>기간</th>
+        <th>ID</th><th>팀</th><th>목표</th><!--<th>대상</th>--><th>상태</th><th>기간</th>
     </tr>
     </thead>
     <tbody>
@@ -28,8 +28,8 @@
         <td>{{ m.mission_id }}</td>
         <td>{{ m.team_name }}</td>
         <td>{{ m.objective }}</td>
-        <td>{{ m.target_desc }}</td>
-        <td>{{ m.status }}</td>
+        <!--<td>{{ m.target_desc }}</td>-->    <!--이거도 안뜨긴 하네... 근데 뭘 띄워야 하지? ... 애초에 테이블에 없는거네 -->
+        <td>{{ m.state }}</td>     <!--요게 문제여... 해결 완!-->
         <td>{{ m.created_at }} ~ {{ m.due_date }}</td>
     </tr>
     {% endfor %}

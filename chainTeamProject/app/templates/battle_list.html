@@ -57,7 +57,7 @@
         <td>
             {% if b.outcome == 'HUNTER_WIN' %}
                 {% if b.active_hunters > 0 %}
-                    <form method="post" action="{{ url_for('main.battle_distribute', battle_id=b.mission_id, battle_seq=b.battle_seq) }}">
+                    <form method="post" action="{{ url_for('main.battle_distribute', mission_id=b.mission_id, battle_seq=b.battle_seq) }}">
                         <button class="btn btn-sm btn-warning">분배하기</button>
                     </form>
                 {% else %}
