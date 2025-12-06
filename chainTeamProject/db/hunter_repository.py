@@ -182,4 +182,33 @@ def get_hunter_detail_with_account(hunter_id):
 
 
 
-    
+# 계약 쪽 코드
+def update_contract(hunter_id, demon_id, cost, power, date):
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                UPDATE Hunter
+                SET demon_id=%s, contract_cost=%s, contract_power=%s, contract_date=%s
+                WHERE hunter_id=%s
+            """, (demon_id, cost, power, date, hunter_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+def get_contract_list():
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:   # ✅ dictionary=True 제거
+            cursor.execute("""
+                SELECT h.hunter_id, h.name AS hunter_name,
+                       d.demon_id, d.name AS demon_name,
+                       h.contract_cost, h.contract_power, h.contract_date
+                FROM Hunter h
+                LEFT JOIN Demon d ON h.demon_id = d.demon_id
+                ORDER BY h.hunter_id
+            """)
+            return cursor.fetchall()    # DictCursor 덕분에 결과가 dict 리스트로 반환됨
+    finally:
+        conn.close()
+

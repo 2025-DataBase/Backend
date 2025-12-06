@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}계약 목록{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h2>계약 목록</h2>
+  <a href="{{ url_for('main.contract_new') }}" class="btn btn-primary">새 계약</a>
+</div>
+
+<table class="table table-hover">
+  <thead>
+    <tr>
+      <th>헌터</th><th>악마</th><th>계약 비용</th><th>계약 능력</th><th>계약 날짜</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for c in contracts %}
+    <tr>
+      <td>{{ c.hunter_name }}</td>
+      <td>{{ c.demon_name or '-' }}</td>
+      <td>{{ c.contract_cost or '-' }}</td>
+      <td>{{ c.contract_power or '-' }}</td>
+      <td>{{ c.contract_date or '-' }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

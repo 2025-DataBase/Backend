@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}새 계약{% endblock %}
+{% block content %}
+<h2>새 계약 등록</h2>
+<form method="post">
+  <div class="mb-3">
+    <label class="form-label">헌터</label>
+    <select class="form-select" name="hunter_id" required>
+      {% for h in hunters %}
+        <option value="{{ h.hunter_id }}">{{ h.name }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">악마</label>
+    <select class="form-select" name="demon_id" required>
+      {% for d in demons %}
+        <option value="{{ d.demon_id }}">{{ d.name }} ({{ d.grade }})</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="mb-3">
+    <label class="form-label">계약 비용</label>
+    <input type="text" class="form-control" name="contract_cost">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">계약 능력</label>
+    <input type="text" class="form-control" name="contract_power">
+  </div>
+  <div class="mb-3">
+    <label class="form-label">계약 날짜</label>
+    <input type="date" class="form-control" name="contract_date">
+  </div>
+  <button type="submit" class="btn btn-success">계약 체결</button>
+</form>
+{% endblock %}

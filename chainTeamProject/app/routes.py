@@ -228,3 +228,62 @@ def get_team_hunters_count(team_id):
         return jsonify({"error": str(e), "alive_count": 0, "total_count": 0}), 500
 
 
+# # 계약 목록 페이지
+# @bp.route("/contracts")
+# def contract_list():
+#     from service import contract_service
+#     contracts = contract_service.list_contracts()
+#     return render_template("contract_list.html", contracts=contracts)
+
+# # 계약 등록 페이지
+# @bp.route("/contracts/new", methods=["GET", "POST"])
+# def contract_new():
+#     from service import contract_service, hunter_service, demon_service
+#     if request.method == "POST":
+#         hunter_id = int(request.form.get("hunter_id"))
+#         demon_id = int(request.form.get("demon_id"))
+#         cost = request.form.get("contract_cost")
+#         power = request.form.get("contract_power")
+#         date = request.form.get("contract_date")
+
+#         try:
+#             contract_service.set_contract(hunter_id, demon_id, cost, power, date)
+#             flash("계약이 체결되었습니다.", "success")
+#             return redirect(url_for("main.contract_list"))
+#         except ValueError as e:
+#             flash(str(e), "danger")
+#             return redirect(url_for("main.contract_new"))
+
+#     hunters = hunter_service.list_hunters()
+#     demons = demon_service.get_demon_risk_list()
+#     return render_template("contract_form.html", hunters=hunters, demons=demons)
+
+
+@bp.route("/contracts")
+def contract_list():
+    from service import contract_service
+    contracts = contract_service.list_contracts()
+    return render_template("contract_list.html", contracts=contracts)
+
+@bp.route("/contracts/new", methods=["GET", "POST"])
+def contract_new():
+    from service import contract_service, hunter_service, demon_service
+    if request.method == "POST":
+        hunter_id = int(request.form.get("hunter_id"))
+        demon_id = int(request.form.get("demon_id"))
+        cost = request.form.get("contract_cost")
+        power = request.form.get("contract_power")
+        date = request.form.get("contract_date")
+
+        try:
+            contract_service.set_contract(hunter_id, demon_id, cost, power, date)
+            flash("계약이 체결되었습니다.", "success")
+            return redirect(url_for("main.contract_list"))
+        except ValueError as e:
+            flash(str(e), "danger")
+            return redirect(url_for("main.contract_new"))
+
+    hunters = hunter_service.list_hunters()
+    demons = demon_service.get_demon_risk_list()
+    return render_template("contract_form.html", hunters=hunters, demons=demons)
+
