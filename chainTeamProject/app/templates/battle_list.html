@@ -22,7 +22,7 @@
     {% if battles %}
         {% for b in battles %}
         <tr>
-            <td>미션 {{ b.mission_id }}-전투 {{ b.battle_seq }}</td>
+            <td>미션 {{ b.mission_id }}</td>
             <td><strong>{{ b.demon_name }}</strong></td>
             <td>{{ b.objective or '-' }}
                 <span class="badge

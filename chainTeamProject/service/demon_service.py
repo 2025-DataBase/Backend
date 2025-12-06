@@ -52,23 +52,16 @@ def get_demon_risk_list():
     for d in demons:
         demon_id = d["demon_id"]
         
-        # Battle 테이블에서 집계한 값
-        battle_killed, battle_injured = demon_repository.recalc_totals_from_battles(demon_id)
-        
-        # Demon 테이블 원본 값과 Battle 집계 값 중 더 큰 값 사용
-        # (Battle 기록이 없으면 원본 값 유지, Battle 기록이 있으면 Battle 값 우선)
-        killed_total = max(d["civilian_kills"], battle_killed)
-        injured_total = max(d["civilian_injuries"], battle_injured)
+        # Demon 테이블의 현재 값을 사용 (이미 Battle 기록이 반영된 값)
+        # 전투 기록 생성 시마다 Demon 테이블이 업데이트되므로, 현재 값이 최신 상태
+        killed_total = d["civilian_kills"]
+        injured_total = d["civilian_injuries"]
         
         # 최종 값으로 등급/현상금 계산
         grade, bounty, score = calculate_grade_and_bounty(killed_total, injured_total)
 
-        # DB 값이랑 차이가 있으면 업데이트
-        if (d["civilian_kills"] != killed_total or
-                d["civilian_injuries"] != injured_total or
-                d["grade"] != grade or
-                d["bounty"] != bounty):
-            
+        # DB 값이랑 차이가 있으면 업데이트 (등급/현상금만)
+        if (d["grade"] != grade or d["bounty"] != bounty):
             demon_repository.update_demon_totals_and_risk(
                 demon_id, killed_total, injured_total, grade, bounty
             )
@@ -83,4 +76,7 @@ def get_demon_risk_list():
             "injured_total": injured_total,
             "score": score,
         })
+    
+    # 위험 점수가 높은 순으로 정렬
+    result.sort(key=lambda x: x["score"], reverse=True)
     return result

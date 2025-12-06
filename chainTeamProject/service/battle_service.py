@@ -102,7 +102,7 @@ def create_battle_record(mission_id, demon_id, outcome, location, civilian_kille
             new_killed = current_demon['civilian_kills'] + civilian_killed
             new_injured = current_demon['civilian_injuries'] + civilian_injured
             
-            # 등급과 현상금 재계산
+            # 등급/현상금 재계산
             from service.demon_service import calculate_grade_and_bounty
             grade, bounty, score = calculate_grade_and_bounty(new_killed, new_injured)
             
@@ -112,16 +112,22 @@ def create_battle_record(mission_id, demon_id, outcome, location, civilian_kille
             )
     else:
         # DEMON_WIN이거나 다른 경우에도 악마 위험도 업데이트 (Battle 기록 반영)
-        battle_killed, battle_injured = demon_repository.recalc_totals_from_battles(demon_id)
+        # 현재 악마의 민간인 피해 수치 가져오기
+        current_demon = demon_repository.get_demon_by_id(demon_id)
         
-        # 등급과 현상금 재계산
-        from service.demon_service import calculate_grade_and_bounty
-        grade, bounty, score = calculate_grade_and_bounty(battle_killed, battle_injured)
-        
-        # Demon 테이블 업데이트
-        demon_repository.update_demon_totals_and_risk(
-            demon_id, battle_killed, battle_injured, grade, bounty
-        )
+        if current_demon:
+            # 현재 전투의 민간인 피해를 바로 추가 (Battle 테이블 합계가 아닌 현재 전투만)
+            new_killed = current_demon['civilian_kills'] + civilian_killed
+            new_injured = current_demon['civilian_injuries'] + civilian_injured
+            
+            # 등급/현상금 재계산
+            from service.demon_service import calculate_grade_and_bounty
+            grade, bounty, score = calculate_grade_and_bounty(new_killed, new_injured)
+            
+            # Demon 테이블 업데이트 (민간인 피해 추가 + 등급/현상금 재계산)
+            demon_repository.update_demon_totals_and_risk(
+                demon_id, new_killed, new_injured, grade, bounty
+            )
 
     # 참여한 헌터들의 전투 참여 기록 생성
     for hunter_id in participant_hunter_ids:
