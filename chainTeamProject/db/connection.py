@@ -5,7 +5,7 @@ def get_connection():
         host="localhost",
         port=3306,
         user="root",
-        password="1234",
+        password="0000",
         database="computer_2",
         charset="utf8mb4",
         cursorclass=pymysql.cursors.DictCursor,

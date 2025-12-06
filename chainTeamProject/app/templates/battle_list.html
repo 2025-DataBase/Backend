@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 {% block title %}전투 기록{% endblock %}
 {% block content %}
-<h2>전투 기록</h2>
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h2>전투 기록</h2>
+    <a href="{{ url_for('main.battle_new') }}" class="btn btn-primary">전투 기록 등록</a>
+</div>
+
 <table class="table table-hover">
     <thead>
     <tr>
@@ -9,70 +13,69 @@
         <th>악마</th>
         <th>미션</th>
         <th>장소</th>
-        <!-- <th>시작</th> -->
         <th>결과</th>
         <th>사망/부상</th>
         <th>분배</th>
     </tr>
     </thead>
     <tbody>
-    {% for b in battles %}
-    <tr>
-        <!--<td>{{ b.battle_id }}</td>-->
-        <td>{{ b.mission_id }}-{{ b.battle_seq }}</td>
-        <td>{{ b.demon_name }}</td>
-        <td>{{ b.objective or '-' }}</td>
-        <td>{{ b.location }}</td>
-        <!-- <td>{{ b.started_at }}</td> -->   <!--테이블에 이게 없네-->
-        <td>{{ b.outcome }}</td>
-        {# 기존 사망/부상 출력 코드 #}
-        {# <td>{{ b.civilian_killed }}/{{ b.civilian_injured }}</td> #}
-        {# 개선: 데이터 없는 경우 '-' 처리 #}
-        <td>
-            {% if b.civilian_killed is not none and b.civilian_injured is not none %}
-                {{ b.civilian_killed }}/{{ b.civilian_injured }}
-            {% else %}
-                -
-            {% endif %}
-        </td>
-
-        {# 기존 분배 칸 코드 #}
-        {# 
-        <td>
-            {% if b.outcome == 'HUNTER_WIN' and b.active_hunters > 0 %}
-            <form method="post" action="{{ url_for('main.battle_distribute', battle_id=b.mission_id, battle_seq=b.battle_seq) }}">
-                <button class="btn btn-sm btn-warning">분배하기</button>
-            </form>
-
-            {% elif b.outcome == 'HUNTER_WIN' %}
-                참여 헌터 없음
-
-            {% else %}
-                -
-            {% endif %}
-        </td>
-        #}
-
-        {# 개선된 분배 칸 코드 #}
-        <td>
-            {% if b.outcome == 'HUNTER_WIN' %}
-                {% if b.active_hunters > 0 %}
-                    <form method="post" action="{{ url_for('main.battle_distribute', mission_id=b.mission_id, battle_seq=b.battle_seq) }}">
-                        <button class="btn btn-sm btn-warning">분배하기</button>
-                    </form>
+    {% if battles %}
+        {% for b in battles %}
+        <tr>
+            <td>미션 {{ b.mission_id }}-전투 {{ b.battle_seq }}</td>
+            <td><strong>{{ b.demon_name }}</strong></td>
+            <td>{{ b.objective or '-' }}
+                <span class="badge
+                    {% if b.mission_state == 'SUCCESS' %}bg-success
+                    {% elif b.mission_state == 'FAIL' %}bg-danger
+                    {% elif b.mission_state == 'IN_PROGRESS' %}bg-warning text-dark
+                    {% else %}bg-secondary
+                    {% endif %}">
+                    {{ b.mission_state }}
+                </span>
+            </td>
+            <td>{{ b.location }}</td>
+            <td>
+                <span class="badge {% if b.outcome == 'HUNTER_WIN' %}bg-success{% else %}bg-danger{% endif %}">
+                    {{ b.outcome }}
+                </span>
+            </td>
+            <td>
+                {% if b.civilian_killed is not none and b.civilian_injured is not none %}
+                    {{ b.civilian_killed }}/{{ b.civilian_injured }}
                 {% else %}
-                    참여 헌터 없음
+                    -
                 {% endif %}
-            {% else %}
-                -
-            {% endif %}
-        </td>
-    </tr>
-    {% endfor %}
+            </td>
+            <td>
+                {% if b.outcome == 'HUNTER_WIN' %}
+                    {% if b.distributed %}
+                        <span class="badge bg-secondary">분배 완료</span>
+                    {% elif b.active_hunters > 0 %}
+                        <form method="post" action="{{ url_for('main.battle_distribute', mission_id=b.mission_id, battle_seq=b.battle_seq) }}" style="display: inline;">
+                            <button class="btn btn-warning btn-sm">💰 분배하기</button>
+                        </form>
+                    {% else %}
+                        <span class="text-muted">참여 헌터중 ALIVE 헌터가 없어 분배 불가</span>
+                    {% endif %}
+                {% else %}
+                    <span class="text-muted">-</span>
+                {% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="7" class="text-center text-muted">
+                등록된 전투 기록이 없습니다.
+            </td>
+        </tr>
+    {% endif %}
     </tbody>
 </table>
 
 <p class="text-muted">
-    ※ 분배하기: 해당 전투에 참여한 ACTIVE 헌터(Distribution 기준)에게 Demon.bounty를 n분의 1로 나누어 Account에 입금합니다.
+    ※ 분배하기: 해당 전투에 참여한 생존 헌터에게 현상금을 n분의 1로 나누어 분배합니다.<br>
+    ※ 사망한 헌터는 자동으로 분배에서 제외됩니다.
 </p>
 {% endblock %}

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="1a0e6bf7-5d92-45f1-b1aa-a4b0ea792cef" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/app/routes.py" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/app/routes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/app/templates/battle_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/app/templates/battle_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/app/templates/demon_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/app/templates/demon_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/app/templates/hunter_form.html" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/app/templates/hunter_form.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/app/templates/mission_assign.html" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/app/templates/mission_assign.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/app/templates/mission_list.html" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/app/templates/mission_list.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/db/battle_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/db/battle_repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/db/connection.py" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/db/connection.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/db/demon_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/db/demon_repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/db/hunter_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/db/hunter_repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/db/mission_repository.py" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/db/mission_repository.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/service/battle_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/service/battle_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/service/demon_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/service/demon_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/service/hunter_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/service/hunter_service.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/chainTeamProject/service/mission_service.py" beforeDir="false" afterPath="$PROJECT_DIR$/chainTeamProject/service/mission_service.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="36T6YMFJRSpNrVVX6iVmYRWpryw" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Python.run.executor": "Run",
+    "Python.work.executor": "Run",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "jungmin",
+    "settings.editor.selected.configurable": "DBNavigator.Project.ConnectionSettings"
+  }
+}]]></component>
+  <component name="RunManager" selected="Python.work">
+    <configuration name="run" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Backend" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/chainTeamProject" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/chainTeamProject/run.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="work" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Backend" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/why" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/why/work.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.work" />
+        <item itemvalue="Python.run" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-python-sdk-53e2683a6804-9cdd278e9d02-com.jetbrains.pycharm.community.sharedIndexes.bundled-PC-251.26094.141" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="1a0e6bf7-5d92-45f1-b1aa-a4b0ea792cef" name="Changes" comment="" />
+      <created>1765018261283</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1765018261283</updated>
+    </task>
+    <servers />
+  </component>
+</project>

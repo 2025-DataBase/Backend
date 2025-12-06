@@ -2,40 +2,104 @@
 {% block title %}미션 생성/할당{% endblock %}
 {% block content %}
 <h2>미션 생성 및 팀 할당</h2>
-<form method="post">
+<form method="post" id="mission_assign_form">
     <div class="mb-3">
         <label class="form-label">팀</label>
-        <select name="team_id" class="form-select" required>
+        <select name="team_id" id="team_select" class="form-select" required>
+            <option value="">팀을 선택하세요</option>
             {% for t in teams %}
             <option value="{{ t.team_id }}">{{ t.team_name }} ({{ t.region }})</option>
+            {% endfor %}
+        </select>
+        <div id="team_validation_message" class="mt-2" style="display: none;"></div>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label"><strong>대상 악마</strong></label>
+        <select name="demon_id" class="form-select" required>
+            <option value="">악마를 선택하세요</option>
+            {% for d in demons %}
+            <option value="{{ d.demon_id }}">
+                {{ d.name }} - 등급: {{ d.grade }} | 현상금: {{ "{:,}".format(d.bounty) }}원 | 위험도: {{ d.score }}
+            </option>
             {% endfor %}
         </select>
     </div>
 
     <div class="mb-3">
-        <label class="form-label">목표(Objective)</label>
-        <input type="text" name="objective" class="form-control" required>
+        <label class="form-label">목표 (Objective)</label>
+        <input type="text" name="objective" class="form-control">
     </div>
 
-    <!-- <div class="mb-3">
-        <label class="form-label">대상 설명(Target)</label>
-        <input type="text" name="target_desc" class="form-control" required>
-    </div> -->
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <label class="form-label">생성일 (created_at)</label>
+            <input type="date" name="created_at" class="form-control" required>
+        </div>
 
-    <div class="mb-3">
-        <label class="form-label">생성일(created_at)</label>
-        <input type="date" name="created_at" class="form-control" required>
+        <div class="col-md-6 mb-3">
+            <label class="form-label">마감일 (due_date)</label>
+            <input type="date" name="due_date" class="form-control" required>
+        </div>
     </div>
 
-    <div class="mb-3">
-        <label class="form-label">마감일(due_date)</label>
-        <input type="date" name="due_date" class="form-control" required>
-    </div>
-
-    <button class="btn btn-success">미션 생성 및 팀 배정</button>
+    <button type="submit" id="submit_btn" class="btn btn-primary">미션 생성 및 팀 배정</button>
+    <a href="{{ url_for('main.mission_list') }}" class="btn btn-secondary">취소</a>
 </form>
 
-<p class="text-muted mt-3">
-    선택된 팀에 ALIVE 헌터가 한 명도 없으면, 미션에 배정할 수 없습니다.
-</p>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const teamSelect = document.getElementById('team_select');
+    const submitBtn = document.getElementById('submit_btn');
+    const validationMessage = document.getElementById('team_validation_message');
+    const form = document.getElementById('mission_assign_form');
+    
+    // 초기 상태: 버튼 활성화 (팀 선택 전에는 활성화 상태)
+    if (submitBtn) {
+        submitBtn.disabled = false;
+    }
+    
+    if (teamSelect) {
+        teamSelect.addEventListener('change', function() {
+            const teamId = this.value;
+            
+            // 팀이 선택되지 않았으면 검증 메시지 숨김
+            if (!teamId) {
+                validationMessage.style.display = 'none';
+                if (submitBtn) submitBtn.disabled = false;
+                return;
+            }
+            
+            // AJAX로 팀의 ALIVE 헌터 수 확인
+            fetch(`/teams/${teamId}/hunters/count`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Team hunters count:', data);
+                    if (data.alive_count > 0) {
+                        // ALIVE 헌터가 있으면 버튼 활성화
+                        if (submitBtn) submitBtn.disabled = false;
+                        validationMessage.style.display = 'none';
+                    } else {
+                        // ALIVE 헌터가 없으면 버튼 비활성화 및 경고 표시
+                        if (submitBtn) submitBtn.disabled = true;
+                        validationMessage.innerHTML = '<div class="alert alert-warning mb-0">⚠️ 선택한 팀에 ALIVE 상태인 헌터가 없습니다. 다른 팀을 선택해주세요.</div>';
+                        validationMessage.style.display = 'block';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking hunters:', error);
+                    // 에러 발생 시에도 버튼은 활성화 (서버 측에서 검증)
+                    if (submitBtn) submitBtn.disabled = false;
+                    validationMessage.innerHTML = '<div class="alert alert-danger mb-0">헌터 정보를 확인할 수 없습니다. 서버 측에서 검증됩니다.</div>';
+                    validationMessage.style.display = 'block';
+                });
+        });
+    }
+});
+</script>
 {% endblock %}

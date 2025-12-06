@@ -7,8 +7,11 @@ def list_hunters():
 def list_teams():
     return hunter_repository.get_all_teams()
 
-def register_hunter(name, status, team_id):
-    hunter_id = hunter_repository.create_hunter(name, status, team_id)
+def register_hunter(name, status):
+    """
+    헌터 등록 - DB 트리거가 자동으로 팀 배정
+    """
+    hunter_id = hunter_repository.create_hunter(name, status)
     account_repository.ensure_account_exists(hunter_id)
     return hunter_id
 

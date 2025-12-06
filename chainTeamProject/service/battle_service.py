@@ -1,33 +1,14 @@
 # service/battle_service.py
 from db import battle_repository, mission_repository, account_repository
 
-# def list_battles():
-#     return battle_repository.get_all_battles_with_demon_mission()
-# def list_battles():
-#     battles = battle_repository.get_all_battles_with_demon_mission()
 def list_battles():
     battles = battle_repository.get_all_battles_with_demon_mission()
-
-    # for b in battles:
-    #     distributions = battle_repository.get_distribution_for_battle(
-    #         b['mission_id'], b['battle_seq']
-    #     )
-    #     b['active_hunters'] = sum(1 for d in distributions if d['state'] == 'IN_PROGRESS')
     for b in battles:
         distributions = battle_repository.get_distribution_for_battle(b['mission_id'], b['battle_seq'])
         b['active_hunters'] = sum(1 for d in distributions if d['distribution_state'] == 'IN_PROGRESS')
-
+        # 분배 완료 여부 확인 (SUCCESS 상태가 하나라도 있으면 분배 완료)
+        b['distributed'] = any(d['distribution_state'] == 'SUCCESS' for d in distributions)
     return battles
-
-# 우씌 잠만... 스파게티 코드 됨 .... 이게 문제가 아닌가? html ㄱㄱ
-
-
-    # # 각 배틀별 active 헌터 수 계산
-    # for b in battles:
-    #     distributions = battle_repository.get_distribution_for_battle(b['mission_id'], b['battle_seq'])
-    #     b['active_hunters'] = sum(1 for d in distributions if d['state'] == 'IN_PROGRESS')
-
-    # return battles
 
 
 def get_battle_detail_with_distribution(battle_id):
@@ -35,82 +16,138 @@ def get_battle_detail_with_distribution(battle_id):
     distributions = battle_repository.get_distribution_for_battle(battle_id)
     return battle, distributions
 
-def distribute_bounty(battle_id, battle_seq):
+
+def distribute_bounty(mission_id, battle_seq):
     """
-    1. battle 읽기
-    2. outcome = HUMAN_WIN 인지 확인
-    3. Distribution에서 참여 헌터 목록 가져오기
-    4. n분의 1로 분배하여 Account 업데이트
-    5. Distribution 상태 DONE
-    6. Mission 상태 SUCCESS 로 변경
+    현상금 분배 - Python 코드로 처리
     """
-    battle = battle_repository.get_battle_by_id(battle_id, battle_seq)
+    battle = battle_repository.get_battle_by_id(mission_id, battle_seq)
     if not battle:
         raise ValueError("존재하지 않는 전투입니다.")
 
     if battle["outcome"] != "HUNTER_WIN":
-        raise ValueError("HUNTER_WIN 전투만 분배할 수 있습니다.")    # HUMAN에서 HUNTER로 교체
+        raise ValueError("HUNTER_WIN 전투만 분배할 수 있습니다.")
 
-    # demon_bounty = battle["bounty"]      demon에 bounty가 없는뎅? vscode 고양이 귀엽다
-    mission_id = battle["mission_id"]
+    # Reward 조회
+    reward = battle_repository.get_reward_for_battle(mission_id, battle_seq)
+    if not reward:
+        raise ValueError("해당 전투에 대한 Reward가 없습니다.")
 
-    distributions = battle_repository.get_distribution_for_battle(battle_id, battle_seq)
-    # active_participants = [d for d in distributions if d["state"] == "IN_PROGRESS"]     # status에서 state로 
-                        # 잠만 .... active가 맞나? 에헤이 강아지 이쁘다 ... 굿!
-                        # -- 돈이 지급중인지, 지급 완료 되었는지 나타내는 state가 추가되었습니다.  `state` ENUM('IN_PROGRESS', 'SUCCESS') NOT NULL , 라는데?
-                        # 일단 IN_PROGRESS로 변경해보자..... 스읍... 맞나?  CALL 911~ 코드에 불이 났어~~
-
-    active_participants = [d for d in distributions if d["distribution_state"] == "IN_PROGRESS"]
-
-
+    # Reward_Distribution에서 IN_PROGRESS 상태이고 ALIVE인 헌터 조회
+    distributions = battle_repository.get_distribution_for_battle(mission_id, battle_seq)
+    active_participants = [
+        d for d in distributions 
+        if d.get('distribution_state') == 'IN_PROGRESS' 
+        and d.get('hunter_status') == 'ALIVE'
+    ]
 
     n = len(active_participants)
     if n == 0:
-        raise ValueError("참여한 ACTIVE 헌터가 없어 분배할 수 없습니다.")
+        raise ValueError("전투에 참여한 ALIVE 헌터가 없어 보상을 지급할 수 없습니다.")
 
-    # share = demon_bounty // n         위에 내가 날려서 일단 주석 처리
-    # reward = battle_repository.get_reward_for_battle(battle_id, share, state="SUCCESS")
-    reward = battle_repository.get_reward_for_battle(mission_id, battle_seq)
+    # 이미 분배된 헌터가 있는지 확인
+    done_count = sum(1 for d in distributions if d.get('distribution_state') == 'SUCCESS')
+    if done_count > 0:
+        raise ValueError("이미 보상 지급이 완료된 전투입니다.")
+
     total_amount = reward["total_amount"]
     share = total_amount // n
-    # 새롭게 반영해 본건데 맞으려나?
-    # 이게 맞나?
 
-
-    # 4. Account 업데이트
+    # Account 업데이트 및 Reward_Distribution 상태 변경
+    # 각 헌터의 계좌에 분배 금액 추가
     for d in active_participants:
         hunter_id = d["hunter_id"]
+        # 계좌가 없으면 생성
+        account_repository.ensure_account_exists(hunter_id)
+        # 계좌 잔액 업데이트
         account_repository.add_income(
             hunter_id,
             share,
-            f"전투 {battle_id} 보상 분배"
+            f"전투 {mission_id}-{battle_seq} 보상 분배"
         )
 
-    # 5. Distribution 상태 DONE + share_amount 기록
-    # battle_repository.update_distribution_to_done(battle_id, share, state="SUCCESS")        # 'IN_PROGRESS', 'SUCCESS' 둘 중 하나요, 그리고 요소 3개용
-    battle_repository.update_distribution_to_done(battle_id, share, battle_seq)
+    # Reward_Distribution 상태 SUCCESS + share_amount 기록 (IN_PROGRESS 상태인 헌터들만)
+    battle_repository.update_distribution_to_done(mission_id, share, battle_seq)
 
-    # 6. 미션 상태 SUCCESS로 변경 (DONE 의미)
-    # if mission_id is not None:
-    #     mission_repository.update_mission_status(mission_id, "SUCCESS")          # 'PLANNED', 'IN_PROGRESS', 'SUCCESS', 'FAIL' 4개 중 하나입니다.
-
-    # return share, n
-
-
-    # 6. 미션 상태 SUCCESS로 변경 (DONE 의미)
-    if mission_id is not None:
-        # 문제 4 핵심: Mission 상태를 바로 SUCCESS로 바꿔버림
-        # 현재 로직:
-        #   - 단일 배틀이 HUNTER_WIN이면 바로 SUCCESS 처리
-        # 잠재적 문제:
-        #   - 하나의 Mission에 여러 Battle이 존재할 수 있음
-        #   - 모든 Battle이 완료되지 않았는데 Mission을 SUCCESS로 바꾸면 잘못된 상태가 됨
-        mission_repository.update_mission_status(mission_id, "SUCCESS")  
-        # → 주석으로 표시:
-        # TODO: Mission 상태 업데이트를 '모든 배틀 완료 후'로 변경 필요
-        # ex) 해당 mission_id의 모든 battle outcome 확인 후, 모두 HUNTER_WIN이면 SUCCESS, 
-        #     하나라도 DEMON_WIN이면 FAIL, 진행중인 배틀이 있으면 IN_PROGRESS 유지
-
-    
     return share, n
 
+
+def create_battle_record(mission_id, demon_id, outcome, location, civilian_killed, civilian_injured,
+                         participant_hunter_ids, dead_hunter_ids):
+    """
+    전투 기록 생성 - 완전판
+    participant_hunter_ids: 전투에 참여한 헌터 ID 리스트
+    dead_hunter_ids: 사망한 헌터 ID 리스트
+    """
+    from db import demon_repository, mission_repository
+    
+    # 다음 battle_seq 번호 가져오기
+    battle_seq = battle_repository.get_next_battle_seq(mission_id)
+
+    # Battle 레코드 생성
+    battle_repository.create_battle(
+        mission_id, battle_seq, demon_id, outcome, location,
+        civilian_killed, civilian_injured
+    )
+
+    # HUNTER_WIN이면 악마 상태를 DEAD로 변경하고 민간인 피해를 바로 추가
+    if outcome == 'HUNTER_WIN':
+        battle_repository.update_demon_status_to_dead(demon_id)
+        
+        # 현재 악마의 민간인 피해 수치 가져오기
+        current_demon = demon_repository.get_demon_by_id(demon_id)
+        
+        if current_demon:
+            # 민간인 피해를 바로 추가
+            new_killed = current_demon['civilian_kills'] + civilian_killed
+            new_injured = current_demon['civilian_injuries'] + civilian_injured
+            
+            # 등급과 현상금 재계산
+            from service.demon_service import calculate_grade_and_bounty
+            grade, bounty, score = calculate_grade_and_bounty(new_killed, new_injured)
+            
+            # Demon 테이블 업데이트 (민간인 피해 추가 + 등급/현상금 재계산)
+            demon_repository.update_demon_totals_and_risk(
+                demon_id, new_killed, new_injured, grade, bounty
+            )
+    else:
+        # DEMON_WIN이거나 다른 경우에도 악마 위험도 업데이트 (Battle 기록 반영)
+        battle_killed, battle_injured = demon_repository.recalc_totals_from_battles(demon_id)
+        
+        # 등급과 현상금 재계산
+        from service.demon_service import calculate_grade_and_bounty
+        grade, bounty, score = calculate_grade_and_bounty(battle_killed, battle_injured)
+        
+        # Demon 테이블 업데이트
+        demon_repository.update_demon_totals_and_risk(
+            demon_id, battle_killed, battle_injured, grade, bounty
+        )
+
+    # 참여한 헌터들의 전투 참여 기록 생성
+    for hunter_id in participant_hunter_ids:
+        # 사망자 목록에 있으면 DEAD, 없으면 ALIVE
+        status = 'DEAD' if hunter_id in dead_hunter_ids else 'ALIVE'
+        battle_repository.create_battle_participation(mission_id, battle_seq, hunter_id, status)
+
+    # 사망한 헌터들의 상태를 DEAD로 변경
+    for hunter_id in dead_hunter_ids:
+        battle_repository.update_hunter_status_to_dead(hunter_id)
+
+    # HUNTER_WIN이고 참여 헌터가 있으면 Reward와 Reward_Distribution 생성
+    if outcome == 'HUNTER_WIN' and len(participant_hunter_ids) > 0:
+        # 미션의 팀 ID 가져오기
+        team_id = mission_repository.get_mission_team_id(mission_id)
+        if team_id:
+            # 악마의 현상금 가져오기 (업데이트된 현상금)
+            current_demon = demon_repository.get_demon_by_id(demon_id)
+            bounty = current_demon['bounty'] if current_demon else 0
+            
+            # Reward 생성
+            reward_id = battle_repository.create_reward(mission_id, battle_seq, team_id, bounty)
+            
+            # Reward_Distribution 생성 (사망자가 아닌 헌터만)
+            alive_hunter_ids = [hid for hid in participant_hunter_ids if hid not in dead_hunter_ids]
+            for hunter_id in alive_hunter_ids:
+                battle_repository.create_reward_distribution(reward_id, hunter_id)
+
+    return battle_seq

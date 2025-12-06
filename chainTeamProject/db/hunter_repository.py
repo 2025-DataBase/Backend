@@ -61,18 +61,20 @@ def get_all_teams():
     finally:
         conn.close()
 
-def create_hunter(name, status, team_id):
+def create_hunter(name, status):
     """
     새 헌터 생성 후 hunter_id 반환.
+    team_id는 DB 트리거(trigger_random_team)가 자동으로 랜덤 배정함.
     """
     conn = get_connection()
     try:
         with conn.cursor() as cursor:
+            # team_id는 NULL로 넘기면 트리거가 자동으로 랜덤 팀 배정
             sql = """
                   INSERT INTO Hunter (name, status, team_id)
-                  VALUES (%s, %s, %s) \
-                  """           # From에서 Human -> Hunter
-            cursor.execute(sql, (name, status, team_id))
+                  VALUES (%s, %s, NULL)
+                  """
+            cursor.execute(sql, (name, status))
             hunter_id = cursor.lastrowid
         conn.commit()
         return hunter_id
@@ -88,13 +90,13 @@ def get_all_hunters_with_team():
                       h.hunter_id,
                       h.name,
                       h.status,
-                      h.team_id,          -- ★ 반드시 포함
+                      h.team_id,
                       t.team_name,
                       t.region
                   FROM Hunter h
                            LEFT JOIN Team t ON h.team_id = t.team_id
-                  ORDER BY t.team_name, h.name \
-                  """           # # From에서 Human -> Hunter
+                  ORDER BY h.hunter_id ASC
+                  """
             cursor.execute(sql)
             return cursor.fetchall()
     finally:

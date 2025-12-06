@@ -1,0 +1,32 @@
+{# demon_form.html #}
+{% extends "base.html" %}
+{% block title %}악마 등록{% endblock %}
+{% block content %}
+<h2>악마 등록</h2>
+<form method="post">
+    <div class="mb-3">
+        <label class="form-label">악마 이름</label>
+        <input type="text" name="name" class="form-control" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">민간인 사망자 수 (civilian_kills)</label>
+        <input type="number" name="civilian_kills" class="form-control" min="0" value="0" required>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">민간인 부상자 수 (civilian_injuries)</label>
+        <input type="number" name="civilian_injuries" class="form-control" min="0" value="0" required>
+    </div>
+
+    <div class="alert alert-info">
+        <strong>악마 위험도 자동 계산 안내</strong><br>
+        • 등급(grade): 위험 점수에 따라 자동 계산<br>
+        • 현상금(bounty): 등급에 따라 자동 설정<br>
+        • 상태(status): 자동으로 ALIVE로 설정
+    </div>
+
+    <button class="btn btn-success">등록</button>
+    <a href="{{ url_for('main.demon_list') }}" class="btn btn-secondary">취소</a>
+</form>
+{% endblock %}

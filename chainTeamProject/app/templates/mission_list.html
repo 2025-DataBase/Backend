@@ -8,35 +8,89 @@
     </a>
 </div>
 
-<div class="mb-2">
-    {% if show_all %}
-    <a href="{{ url_for('main.mission_list') }}" class="btn btn-sm btn-secondary">진행중만 보기</a>
-    {% else %}
-    <a href="{{ url_for('main.mission_list', all=1) }}" class="btn btn-sm btn-outline-secondary">전체 보기(완료 포함)</a>
-    {% endif %}
+<!-- 필터 버튼 그룹 -->
+<div class="mb-3">
+    <div class="btn-group" role="group">
+        <a href="{{ url_for('main.mission_list', filter='all') }}" 
+           class="btn {% if filter_type == 'all' %}btn-primary{% else %}btn-outline-primary{% endif %}">
+            전체보기
+        </a>
+        <a href="{{ url_for('main.mission_list', filter='in_progress') }}" 
+           class="btn {% if filter_type == 'in_progress' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+            진행중
+        </a>
+        <a href="{{ url_for('main.mission_list', filter='success') }}" 
+           class="btn {% if filter_type == 'success' %}btn-success{% else %}btn-outline-success{% endif %}">
+            미션 완료
+        </a>
+        <a href="{{ url_for('main.mission_list', filter='fail') }}" 
+           class="btn {% if filter_type == 'fail' %}btn-danger{% else %}btn-outline-danger{% endif %}">
+            미션 실패
+        </a>
+    </div>
 </div>
 
-<table class="table table-striped">
+<table class="table">
     <thead>
     <tr>
-        <th>ID</th><th>팀</th><th>목표</th><!--<th>대상</th>--><th>상태</th><th>기간</th>
+        <th>ID</th>
+        <th>팀</th>
+        <th>목표</th>
+        <th>상태</th>
+        <th>생성일</th>
+        <th>마감일</th>
+        <th>상태 변경</th>
     </tr>
     </thead>
     <tbody>
-    {% for m in missions %}
-    <tr>
-        <td>{{ m.mission_id }}</td>
-        <td>{{ m.team_name }}</td>
-        <td>{{ m.objective }}</td>
-        <!--<td>{{ m.target_desc }}</td>-->    <!--이거도 안뜨긴 하네... 근데 뭘 띄워야 하지? ... 애초에 테이블에 없는거네 -->
-        <td>{{ m.state }}</td>     <!--요게 문제여... 해결 완!-->
-        <td>{{ m.created_at }} ~ {{ m.due_date }}</td>
-    </tr>
-    {% endfor %}
+    {% if missions %}
+        {% for m in missions %}
+        <tr>
+            <td>{{ m.mission_id }}</td>
+            <td>{{ m.team_name or '-' }}</td>
+            <td>{{ m.objective }}</td>
+            <td>
+                <span class="badge 
+                    {% if m.state == 'SUCCESS' %}bg-success
+                    {% elif m.state == 'FAIL' %}bg-danger
+                    {% elif m.state == 'IN_PROGRESS' %}bg-warning text-dark
+                    {% else %}bg-secondary
+                    {% endif %}">
+                    {{ m.state }}
+                </span>
+            </td>
+            <td>{{ m.created_at }}</td>
+            <td>{{ m.due_date }}</td>
+            <td>
+                <form method="post" action="{{ url_for('main.mission_update_state', mission_id=m.mission_id) }}" 
+                      style="display: inline-block;">
+                    <select name="state" class="form-select form-select-sm" style="width: 140px; display: inline-block;" 
+                            onchange="this.form.submit()">
+                        <option value="">상태 변경...</option>
+                        <option value="PLANNED" {% if m.state == 'PLANNED' %}disabled{% endif %}>PLANNED</option>
+                        <option value="IN_PROGRESS" {% if m.state == 'IN_PROGRESS' %}disabled{% endif %}>IN_PROGRESS</option>
+                        <option value="SUCCESS" {% if m.state == 'SUCCESS' %}disabled{% endif %}>SUCCESS</option>
+                        <option value="FAIL" {% if m.state == 'FAIL' %}disabled{% endif %}>FAIL</option>
+                    </select>
+                </form>
+            </td>
+        </tr>
+        {% endfor %}
+    {% else %}
+        <tr>
+            <td colspan="7" class="text-center text-muted">
+                {% if filter_type == 'in_progress' %}
+                    진행중인 미션이 없습니다.
+                {% elif filter_type == 'success' %}
+                    완료된 미션이 없습니다.
+                {% elif filter_type == 'fail' %}
+                    실패한 미션이 없습니다.
+                {% else %}
+                    등록된 미션이 없습니다.
+                {% endif %}
+            </td>
+        </tr>
+    {% endif %}
     </tbody>
 </table>
-
-<p class="text-muted">
-    SUCCESS 상태(=DONE)는 기본 목록에서 제외되며, “전체 보기”로 확인 가능합니다.
-</p>
 {% endblock %}
