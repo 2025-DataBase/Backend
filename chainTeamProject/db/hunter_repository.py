@@ -117,18 +117,35 @@ def get_hunter_detail_with_account(hunter_id):
                    t.team_name,
                    a.balance,
                    IFNULL(SUM(rd.distributer_amount), 0) AS total_income,
-                   0 AS total_spent,
-                   MAX(rd.distributed_at) AS last_tx_date,
-                   MAX(rd.distributer_amount) AS last_tx_amount,
-                   CASE WHEN MAX(rd.distributer_amount) IS NOT NULL THEN 'REWARD' ELSE NULL END AS last_tx_type,
-                   CASE WHEN MAX(rd.distributer_amount) IS NOT NULL THEN '현상금 분배' ELSE NULL END AS last_tx_desc
+                   IFNULL(h.contract_cost, 0) AS total_spent,
+                   GREATEST(
+                       COALESCE(MAX(rd.distributed_at), '1900-01-01'),
+                       COALESCE(h.contract_date, '1900-01-01')
+                   ) AS last_tx_date,
+                   CASE 
+                       WHEN h.contract_date >= COALESCE(MAX(rd.distributed_at), '1900-01-01') 
+                       THEN h.contract_cost
+                       ELSE MAX(rd.distributer_amount)
+                   END AS last_tx_amount,
+                   CASE 
+                       WHEN h.contract_date >= COALESCE(MAX(rd.distributed_at), '1900-01-01') 
+                       THEN 'CONTRACT'
+                       WHEN MAX(rd.distributer_amount) IS NOT NULL THEN 'REWARD'
+                       ELSE NULL
+                   END AS last_tx_type,
+                   CASE 
+                       WHEN h.contract_date >= COALESCE(MAX(rd.distributed_at), '1900-01-01') 
+                       THEN '계약 체결'
+                       WHEN MAX(rd.distributer_amount) IS NOT NULL THEN '현상금 분배'
+                       ELSE NULL
+                   END AS last_tx_desc
             FROM Hunter h
             LEFT JOIN Team t ON h.team_id = t.team_id
             LEFT JOIN Account a ON h.hunter_id = a.hunter_id
             LEFT JOIN Reward_Distribution rd 
                    ON h.hunter_id = rd.hunter_id AND rd.state='SUCCESS'
             WHERE h.hunter_id = %s
-            GROUP BY h.hunter_id, h.name, h.status, t.team_name, a.balance
+            GROUP BY h.hunter_id, h.name, h.status, t.team_name, a.balance, h.contract_cost, h.contract_date
             """
             cursor.execute(sql, (hunter_id,))
             return cursor.fetchone()
@@ -152,18 +169,22 @@ def update_contract(hunter_id, demon_id, cost, power, date):
         conn.close()
 
 def get_contract_list():
+    """
+    계약 목록 조회 - 계약이 있는 모든 헌터(ALIVE/DEAD 포함) 반환
+    """
     conn = get_connection()
     try:
-        with conn.cursor() as cursor:   #  dictionary=True 제거
+        with conn.cursor() as cursor:
             cursor.execute("""
-                SELECT h.hunter_id, h.name AS hunter_name,
+                SELECT h.hunter_id, h.name AS hunter_name, h.status AS hunter_status,
                        d.demon_id, d.name AS demon_name,
                        h.contract_cost, h.contract_power, h.contract_date
                 FROM Hunter h
                 LEFT JOIN Demon d ON h.demon_id = d.demon_id
-                ORDER BY h.hunter_id
+                WHERE h.demon_id IS NOT NULL
+                ORDER BY h.contract_date DESC, h.hunter_id
             """)
-            return cursor.fetchall()    # DictCursor 덕분에 결과가 dict 리스트로 반환됨
+            return cursor.fetchall()
     finally:
         conn.close()
 

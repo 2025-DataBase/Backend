@@ -62,6 +62,9 @@ def update_demon_totals_and_risk(demon_id, killed_total, injured_total,
             cursor.execute(sql, (killed_total, injured_total,
                                  grade, bounty, demon_id))
         conn.commit()
+    except Exception as e:
+        conn.rollback()
+        raise ValueError(f"악마 정보 업데이트 실패: {str(e)}")
     finally:
         conn.close()
 

@@ -109,7 +109,9 @@ def mission_assign():
 
     # GET 요청 시 - 팀 목록과 악마 목록 전달
     teams = hunter_service.list_teams()
-    demons = demon_service.get_demon_risk_list()
+    # ALIVE 악마만 필터링
+    all_demons = demon_service.get_demon_risk_list()
+    demons = [d for d in all_demons if d.get('status') == 'ALIVE']
     return render_template("mission_assign.html", teams=teams, demons=demons)
 
 # 미션 상태 변경
@@ -181,9 +183,17 @@ def battle_new():
     
     # GET 요청 - SUCCESS/FAIL 상태 미션 목록과 악마 목록 전달
     completed_missions = mission_service.get_mission_list('completed')
-    demons = demon_service.get_demon_risk_list()
     
-    return render_template("battle_form.html", missions=completed_missions, demons=demons)
+    # 이미 전투 기록이 있는 미션 제외
+    from db import battle_repository
+    mission_ids_with_battles = battle_repository.get_mission_ids_with_battles()
+    missions = [m for m in completed_missions if m['mission_id'] not in mission_ids_with_battles]
+    
+    # ALIVE 악마만 필터링
+    all_demons = demon_service.get_demon_risk_list()
+    demons = [d for d in all_demons if d.get('status') == 'ALIVE']
+    
+    return render_template("battle_form.html", missions=missions, demons=demons)
 
 # 미션의 팀원 조회 (AJAX)
 @bp.route("/missions/<int:mission_id>/hunters")
@@ -236,7 +246,7 @@ def contract_new():
     if request.method == "POST":
         hunter_id = int(request.form.get("hunter_id"))
         demon_id = int(request.form.get("demon_id"))
-        cost = request.form.get("contract_cost")
+        cost = 300000  # 계약 비용 고정
         power = request.form.get("contract_power")
         date = request.form.get("contract_date")
 
@@ -248,7 +258,11 @@ def contract_new():
             flash(str(e), "danger")
             return redirect(url_for("main.contract_new"))
 
-    hunters = hunter_service.list_hunters()
-    demons = demon_service.get_demon_risk_list()
+    # ALIVE 헌터만 필터링
+    all_hunters = hunter_service.list_hunters()
+    hunters = [h for h in all_hunters if h.get('status') == 'ALIVE']
+    # ALIVE 악마만 필터링
+    all_demons = demon_service.get_demon_risk_list()
+    demons = [d for d in all_demons if d.get('status') == 'ALIVE']
     return render_template("contract_form.html", hunters=hunters, demons=demons)
 

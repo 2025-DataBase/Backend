@@ -43,5 +43,32 @@ def add_income(hunter_id, amount, desc=None):
     finally:
         conn.close()
 
+def add_expense(hunter_id, amount, desc=None):
+    """
+    계좌에서 지출 차감
+    """
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            # 계좌 존재 확인 및 생성
+            ensure_account_exists(hunter_id)
+            # 잔액 확인
+            cursor.execute("""
+                SELECT balance FROM Account WHERE hunter_id = %s
+            """, (hunter_id,))
+            account = cursor.fetchone()
+            if account and account['balance'] < amount:
+                raise ValueError(f"잔액이 부족합니다. 현재 잔액: {account['balance']:,}원, 필요 금액: {amount:,}원")
+            
+            # 잔액 차감
+            cursor.execute("""
+                UPDATE Account
+                SET balance = balance - %s
+                WHERE hunter_id = %s
+            """, (amount, hunter_id))
+        conn.commit()
+    finally:
+        conn.close()
+
 
 
