@@ -230,3 +230,20 @@ def call_distribute_bounty_procedure(mission_id, battle_seq):
         raise e
     finally:
         conn.close()
+
+def get_mission_ids_with_battles():
+    """
+    전투 기록이 있는 미션 ID 목록 반환
+    """
+    conn = get_connection()
+    try:
+        with conn.cursor() as cursor:
+            sql = """
+                SELECT DISTINCT mission_id
+                FROM Battle
+            """
+            cursor.execute(sql)
+            results = cursor.fetchall()
+            return [row['mission_id'] for row in results]
+    finally:
+        conn.close()

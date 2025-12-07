@@ -17,60 +17,6 @@ def get_battle_detail_with_distribution(battle_id):
     return battle, distributions
 
 
-def distribute_bounty(mission_id, battle_seq):
-    """
-    현상금 분배 - Python 코드로 처리
-    """
-    battle = battle_repository.get_battle_by_id(mission_id, battle_seq)
-    if not battle:
-        raise ValueError("존재하지 않는 전투입니다.")
-
-    if battle["outcome"] != "HUNTER_WIN":
-        raise ValueError("HUNTER_WIN 전투만 분배할 수 있습니다.")
-
-    # Reward 조회
-    reward = battle_repository.get_reward_for_battle(mission_id, battle_seq)
-    if not reward:
-        raise ValueError("해당 전투에 대한 Reward가 없습니다.")
-
-    # Reward_Distribution에서 IN_PROGRESS 상태이고 ALIVE인 헌터 조회
-    distributions = battle_repository.get_distribution_for_battle(mission_id, battle_seq)
-    active_participants = [
-        d for d in distributions 
-        if d.get('distribution_state') == 'IN_PROGRESS' 
-        and d.get('hunter_status') == 'ALIVE'
-    ]
-
-    n = len(active_participants)
-    if n == 0:
-        raise ValueError("전투에 참여한 ALIVE 헌터가 없어 보상을 지급할 수 없습니다.")
-
-    # 이미 분배된 헌터가 있는지 확인
-    done_count = sum(1 for d in distributions if d.get('distribution_state') == 'SUCCESS')
-    if done_count > 0:
-        raise ValueError("이미 보상 지급이 완료된 전투입니다.")
-
-    total_amount = reward["total_amount"]
-    share = total_amount // n
-
-    # Account 업데이트 및 Reward_Distribution 상태 변경
-    # 각 헌터의 계좌에 분배 금액 추가
-    for d in active_participants:
-        hunter_id = d["hunter_id"]
-        # 계좌가 없으면 생성
-        account_repository.ensure_account_exists(hunter_id)
-        # 계좌 잔액 업데이트
-        account_repository.add_income(
-            hunter_id,
-            share,
-            f"전투 {mission_id}-{battle_seq} 보상 분배"
-        )
-
-    # Reward_Distribution 상태 SUCCESS + share_amount 기록 (IN_PROGRESS 상태인 헌터들만)
-    battle_repository.update_distribution_to_done(mission_id, share, battle_seq)
-
-    return share, n
-
 
 def create_battle_record(mission_id, demon_id, outcome, location, civilian_killed, civilian_injured,
                          participant_hunter_ids, dead_hunter_ids):
@@ -157,3 +103,20 @@ def create_battle_record(mission_id, demon_id, outcome, location, civilian_kille
                 battle_repository.create_reward_distribution(reward_id, hunter_id)
 
     return battle_seq
+
+def distribute_bounty(mission_id, battle_seq):
+    """
+    현상금 분배 - SQL 프로시저를 사용하여 처리
+    """
+    try:
+        # SQL 프로시저 호출
+        result = battle_repository.call_distribute_bounty_procedure(mission_id, battle_seq)
+        if result:
+            share = result.get('share', 0)
+            participant_count = result.get('participant_count', 0)
+            return share, participant_count
+        else:
+            raise ValueError("프로시저 실행 결과를 받을 수 없습니다.")
+    except Exception as e:
+        # 프로시저에서 발생한 오류를 그대로 전달
+        raise ValueError(str(e))
