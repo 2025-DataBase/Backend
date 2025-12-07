@@ -9,6 +9,7 @@ bp = Blueprint("main", __name__)
 def index():
     return redirect(url_for("main.demon_list"))
 
+
 # 1. 악마 위험도 표시 페이지
 @bp.route("/demons")
 def demon_list():
@@ -35,6 +36,7 @@ def demon_new():
         return redirect(url_for("main.demon_list"))
 
     return render_template("demon_form.html")
+
 
 # 2. 헌터 목록 페이지 + 등록 폼
 @bp.route("/hunters")
@@ -67,6 +69,7 @@ def hunter_detail(hunter_id):
         return redirect(url_for("main.hunter_list"))
     return render_template("hunter_detail.html", hunter=hunter)
 
+
 # 3. 미션 목록 페이지
 @bp.route("/missions")
 def mission_list():
@@ -75,6 +78,7 @@ def mission_list():
     return render_template("mission_list.html",
                            missions=missions,
                            filter_type=filter_type)
+
 
 # 4. 미션 생성 + 팀 할당 페이지
 @bp.route("/missions/assign", methods=["GET", "POST"])
@@ -125,21 +129,13 @@ def mission_update_state(mission_id):
     
     return redirect(url_for("main.mission_list"))
 
+
 # 5. 전투 기록 페이지
 @bp.route("/battles")
 def battle_list():
     battles = battle_service.list_battles()
     return render_template("battle_list.html", battles=battles)
 
-# @bp.route("/battles/<int:battle_id>/distribute", methods=["POST"])
-# def battle_distribute(battle_id):
-#     try:
-#         share, n = battle_service.distribute_bounty(battle_id)
-#         flash(f"{n}명의 헌터에게 각 {share}원씩 분배했습니다.", "success")
-#     except ValueError as e:
-#         flash(str(e), "danger")
-
-#     return redirect(url_for("main.battle_list"))
 
 @bp.route('/battle_distribute/<int:mission_id>/<int:battle_seq>', methods=['POST'])
 def battle_distribute(mission_id, battle_seq):
@@ -226,37 +222,6 @@ def get_team_hunters_count(team_id):
         error_msg = traceback.format_exc()
         print(f"Error in get_team_hunters_count: {error_msg}")
         return jsonify({"error": str(e), "alive_count": 0, "total_count": 0}), 500
-
-
-# # 계약 목록 페이지
-# @bp.route("/contracts")
-# def contract_list():
-#     from service import contract_service
-#     contracts = contract_service.list_contracts()
-#     return render_template("contract_list.html", contracts=contracts)
-
-# # 계약 등록 페이지
-# @bp.route("/contracts/new", methods=["GET", "POST"])
-# def contract_new():
-#     from service import contract_service, hunter_service, demon_service
-#     if request.method == "POST":
-#         hunter_id = int(request.form.get("hunter_id"))
-#         demon_id = int(request.form.get("demon_id"))
-#         cost = request.form.get("contract_cost")
-#         power = request.form.get("contract_power")
-#         date = request.form.get("contract_date")
-
-#         try:
-#             contract_service.set_contract(hunter_id, demon_id, cost, power, date)
-#             flash("계약이 체결되었습니다.", "success")
-#             return redirect(url_for("main.contract_list"))
-#         except ValueError as e:
-#             flash(str(e), "danger")
-#             return redirect(url_for("main.contract_new"))
-
-#     hunters = hunter_service.list_hunters()
-#     demons = demon_service.get_demon_risk_list()
-#     return render_template("contract_form.html", hunters=hunters, demons=demons)
 
 
 @bp.route("/contracts")

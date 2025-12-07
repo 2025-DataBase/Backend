@@ -1,30 +1,6 @@
 # db/mission_repository.py
 from .connection import get_connection
 
-# def get_active_missions():
-#     """
-#     SUCCESS(=DONE) 아닌 미션 목록
-#     """
-#     conn = get_connection()
-#     try:
-#         with conn.cursor() as cursor:
-#             sql = """
-#                   SELECT
-#                       m.mission_id,
-#                       m.objective,
-#                       m.state,
-#                       m.created_at,
-#                       m.due_date,
-#                       t.team_name
-#                   FROM Mission m
-#                            JOIN Team t ON m.team_id = t.team_id
-#                   WHERE m.state != 'SUCCESS'
-#                   ORDER BY m.created_at DESC \
-#                   """           # m.target_desc, 해당 부분 삭제, status에서 state 바뀜
-#             cursor.execute(sql)
-#             return cursor.fetchall()
-#     finally:
-#         conn.close()
 
 def get_active_missions():
     """
@@ -47,27 +23,7 @@ def get_active_missions():
     finally:
         conn.close()
 
-# def get_all_missions():
-#     conn = get_connection()
-#     try:
-#         with conn.cursor() as cursor:
-#             sql = """
-#                   SELECT
-#                       m.mission_id,
-#                       m.objective,
-                      
-#                       m.state,
-#                       m.created_at,
-#                       m.due_date,
-#                       t.team_name
-#                   FROM Mission m
-#                            JOIN Team t ON m.team_id = t.team_id
-#                   ORDER BY m.created_at DESC \
-#                   """
-#             cursor.execute(sql)
-#             return cursor.fetchall()
-#     finally:
-#         conn.close()
+
 
 def get_all_missions():
     """
@@ -89,24 +45,7 @@ def get_all_missions():
     finally:
         conn.close()
 
-# def create_mission(team_id, objective, 
-#                    created_at, due_date):
-#     conn = get_connection()
-#     try:
-#         with conn.cursor() as cursor:
-#             sql = """
-#                   INSERT INTO Mission(
-#                       team_id, objective, 
-#                       state, created_at, due_date
-#                   ) VALUES (%s, %s, %s, 'PLANNED', %s, %s) \
-#                   """
-#             cursor.execute(sql, (team_id, objective, 
-#                                  created_at, due_date))
-#             mission_id = cursor.lastrowid
-#         conn.commit()
-#         return mission_id
-#     finally:
-#         conn.close()
+
 
 def create_mission(objective, created_at, due_date):
     """
@@ -126,22 +65,7 @@ def create_mission(objective, created_at, due_date):
     finally:
         conn.close()
 
-# def assign_team_to_mission(mission_id, team_id):
-#     """
-#     MissionAssignment에 팀 배정 (중복 배정은 UNIQUE로 막힘)
-#     """
-#     conn = get_connection()
-#     try:
-#         with conn.cursor() as cursor:
-#             sql = """
-#                   INSERT INTO MissionAssignment(
-#                       mission_id, team_id, assignment_status
-#                   ) VALUES (%s, %s, 'PLANNED') \
-#                   """
-#             cursor.execute(sql, (mission_id, team_id))
-#         conn.commit()
-#     finally:
-#         conn.close()
+
 
 def assign_team_to_mission(mission_id, team_id):
     conn = get_connection()
@@ -173,6 +97,7 @@ def update_mission_status(mission_id, new_state):
     finally:
         conn.close()
 
+
 def get_mission_team_id(mission_id):
     """
     미션에 할당된 팀 ID 조회
@@ -191,6 +116,7 @@ def get_mission_team_id(mission_id):
             return result['team_id'] if result else None
     finally:
         conn.close()
+
 
 def get_completed_missions():
     """
@@ -221,6 +147,8 @@ def get_completed_missions():
     finally:
         conn.close()
 
+
+
 def get_in_progress_missions():
     """
     진행중인 미션 (IN_PROGRESS만) - 마감일 긴박한 순
@@ -242,6 +170,8 @@ def get_in_progress_missions():
     finally:
         conn.close()
 
+
+
 def get_success_missions():
     """
     완료된 미션 (SUCCESS) - 최신순
@@ -262,6 +192,8 @@ def get_success_missions():
             return cursor.fetchall()
     finally:
         conn.close()
+
+
 
 def get_fail_missions():
     """

@@ -1,30 +1,7 @@
 # db/hunter_repository.py
 from .connection import get_connection
-# from . import db
-# from sqlalchemy import text
 
-# def get_all_hunters_with_team():
-#     conn = get_connection()
-#     try:
-#         with conn.cursor() as cursor:
-#             sql = """
-#                   SELECT
-#                       h.hunter_id,
-#                       h.name,
-#                       h.status,
-#                       t.team_name,
-#                       t.region
-#                   FROM Human h
-#                            LEFT JOIN Team t ON h.team_id = t.team_id
-#                   ORDER BY t.team_name, h.name \
-#                   """
-#             cursor.execute(sql)
-#             return cursor.fetchall()
-#     finally:
-#         conn.close()
-# 해당 함수 및에 있는거 아님...? 중복이라 일단 제거함
 
-# 개선 완료
 def get_hunter_by_id(hunter_id):
     conn = get_connection()
     try:
@@ -128,29 +105,7 @@ def get_hunters_by_team(team_id):
     finally:
         conn.close()
 
-# def get_hunter_detail_with_account(hunter_id):
-#     query = text("""
-#     SELECT h.hunter_id,
-#            h.name,
-#            h.status,
-#            t.team_name,
-#            a.balance,
-#            IFNULL(SUM(rd.distributer_amount), 0) AS total_income,
-#            0 AS total_spent,
-#            MAX(rd.distributed_at) AS last_tx_date,
-#            MAX(rd.distributer_amount) AS last_tx_amount,
-#            'REWARD' AS last_tx_type,
-#            '현상금 분배' AS last_tx_desc
-#     FROM Hunter h
-#     LEFT JOIN Team t ON h.team_id = t.team_id
-#     LEFT JOIN Account a ON h.hunter_id = a.hunter_id
-#     LEFT JOIN Reward_Distribution rd 
-#            ON h.hunter_id = rd.hunter_id AND rd.state='SUCCESS'
-#     WHERE h.hunter_id = :hunter_id
-#     GROUP BY h.hunter_id, h.name, h.status, t.team_name, a.balance;
-#     """)
-#     result = db.session.execute(query, {"hunter_id": hunter_id}).fetchone()
-#     return result
+
 def get_hunter_detail_with_account(hunter_id):
     conn = get_connection()
     try:
@@ -165,8 +120,8 @@ def get_hunter_detail_with_account(hunter_id):
                    0 AS total_spent,
                    MAX(rd.distributed_at) AS last_tx_date,
                    MAX(rd.distributer_amount) AS last_tx_amount,
-                   'REWARD' AS last_tx_type,
-                   '현상금 분배' AS last_tx_desc
+                   CASE WHEN MAX(rd.distributer_amount) IS NOT NULL THEN 'REWARD' ELSE NULL END AS last_tx_type,
+                   CASE WHEN MAX(rd.distributer_amount) IS NOT NULL THEN '현상금 분배' ELSE NULL END AS last_tx_desc
             FROM Hunter h
             LEFT JOIN Team t ON h.team_id = t.team_id
             LEFT JOIN Account a ON h.hunter_id = a.hunter_id
@@ -199,7 +154,7 @@ def update_contract(hunter_id, demon_id, cost, power, date):
 def get_contract_list():
     conn = get_connection()
     try:
-        with conn.cursor() as cursor:   # ✅ dictionary=True 제거
+        with conn.cursor() as cursor:   #  dictionary=True 제거
             cursor.execute("""
                 SELECT h.hunter_id, h.name AS hunter_name,
                        d.demon_id, d.name AS demon_name,
